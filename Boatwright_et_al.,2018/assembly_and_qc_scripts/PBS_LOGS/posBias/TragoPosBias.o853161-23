@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/scratch/lfs/mcintyre/trago/scripts/position_bias_v3.py", line 93, in <module>
-    main()
-  File "/scratch/lfs/mcintyre/trago/scripts/position_bias_v3.py", line 86, in main
-    file_in = fastq_reader(args.fname)
-  File "/scratch/lfs/mcintyre/trago/scripts/position_bias_v3.py", line 26, in fastq_reader
-    with open(fname, "rU") as handle:
-IOError: [Errno 2] No such file or directory: 'Tpo1_GCCAAT_L003_R1_001.fastq'
