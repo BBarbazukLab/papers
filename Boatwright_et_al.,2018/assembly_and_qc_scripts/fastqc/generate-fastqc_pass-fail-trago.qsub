@@ -1,0 +1,28 @@
+#!/bin/bash 
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -l walltime=01:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=900M
+#PBS -j oe
+#PBS -o /bio/mcintyre/trago/outfiles/PBS_LOGS/fastqc/
+
+#generate fastqc files
+
+PROJ=/bio/mcintyre/trago
+DATAIN=$PROJ/outfiles/fastqc/diploids
+FASTQC=$PROJ/scripts/fastqc_pass-fail_list_rlb.pl
+OUTDIR=$PROJ/outfiles/fastqc_summary/diploids
+
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+cd $DATAIN
+
+echo "Sample_id,basic_stats,base_qual,seq_qual,base_content,base_GC,seq_GC,base_N,seq_length,seq_dup,seq_overrep,kmer,percent_pass" > $OUTDIR/fastqc_pass-fail_summary.csv
+
+for SAMPLE in $( find ./ -maxdepth 1 -type d -print | cut -d'/' -f2)
+do
+    	FILE=$INDIR/$SAMPLE/summary.txt
+	perl $FASTQC $SAMPLE $FILE  >> $OUTDIR/fastqc_pass-fail_summary.csv
+done

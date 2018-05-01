@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio 
+#PBS -l walltime=1:00:00
+#PBS -l pmem=1gb
+
+
+## use BEDtools to identify a gene for a blast query
+
+ ## -a is bed file of queries want to annotate
+ ## -b is bed file of genes
+ ## -u report whether aln overlaps gene, if not aln not reported
+ ## -v report where NO overlap
+ ## -wa report entire entry for each overlap with gene entries
+
+module load bedtools
+
+# queries with genes 
+intersectBed -a /bio/mcintyre/trago/dros_outfiles/BED_blast_trinity_zero_Dchrom.bed -b /bio/mcintyre/trago/dros_outfiles/gene_map_table.bed -wa -wb >/bio/mcintyre/trago/dros_outfiles/trinity_zero_Dchrom_blast_with_gene_id.bed
+intersectBed -a /bio/mcintyre/trago/dros_outfiles/BED_blast_trinity_10_Dchrom.bed -b /bio/mcintyre/trago/dros_outfiles/gene_map_table.bed -wa -wb  >/bio/mcintyre/trago/dros_outfiles/trinity_10_Dchrom_blast_with_gene_id.bed
+

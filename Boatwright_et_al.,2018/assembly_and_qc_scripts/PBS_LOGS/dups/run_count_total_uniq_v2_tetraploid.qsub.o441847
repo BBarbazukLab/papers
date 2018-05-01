@@ -1,0 +1,144 @@
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm1_AGTCAA_L001_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm1_AGTCAA_L002_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm1_AGTCAA_L003_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm1_AGTCAA_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm1_AGTCAA_L002_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm1_AGTCAA_L003_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm2_AGTTCC_L001_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm2_AGTTCC_L002_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm2_AGTTCC_L003_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm2_AGTTCC_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm2_AGTTCC_L002_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm2_AGTTCC_L003_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm3_ATGTCA_L001_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm3_ATGTCA_L002_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm3_ATGTCA_L003_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm3_ATGTCA_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm3_ATGTCA_L002_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tm3_ATGTCA_L003_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms1_GAGTGG_L001_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms1_GAGTGG_L002_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms1_GAGTGG_L003_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms1_GAGTGG_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms1_GAGTGG_L002_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms1_GAGTGG_L003_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms2_ACTGAT_L001_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms2_ACTGAT_L002_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms2_ACTGAT_L003_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms2_ACTGAT_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms2_ACTGAT_L002_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms2_ACTGAT_L003_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms3_ATTCCT_L001_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms3_ATTCCT_L002_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms3_ATTCCT_L003_R2_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms3_ATTCCT_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms3_ATTCCT_L002_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tms3_ATTCCT_L003_R1_001.csv'

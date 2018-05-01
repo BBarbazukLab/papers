@@ -1,0 +1,51 @@
+#!/bin/bash
+#PBS -N trimmo
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=15:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+
+module load trimmomatic/0.22
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+DROS=$PROJ/dros_test_assembly
+
+#### Create LOG directory and start log
+LOGS=$DROS/LOGS 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+TRIMOLOG=$LOGS/r324_trimmomatic.log
+
+#### Start Trimmomatic
+READS1=$DROS/cutadapt/r324_1_cutadapt.fq
+READS2=$DROS/cutadapt/r324_2_cutadapt.fq
+OUT1=$DROS/trimmomatic
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+TRIM1=$OUT1/r324_1_trim_paired.fq
+TRIM2=$OUT1/r324_1_trim_unpaired.fq
+TRIM3=$OUT1/r324_2_trim_paired.fq
+TRIM4=$OUT1/r324_2_trim_unpaired.fq
+
+
+#### RUN trimmomatic on Paired end Files
+java -classpath $HPC_TRIMMOMATIC_LIB/trimmomatic.jar \
+     org.usadellab.trimmomatic.TrimmomaticPE \
+     -threads 4 -phred33 -trimlog $TRIMOLOG \
+     $READS1 $READS2 $TRIM1 $TRIM2 $TRIM3 $TRIM4 \
+     HEADCROP:10 \
+     LEADING:3 \
+     SLIDINGWINDOW:4:15 \
+     MINLEN:60

@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio
+#PBS -l walltime=05:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=2gb
+
+## Set directories and variables
+PROJ=/scratch/lfs/mcintyre/trago
+REF=/scratch/lfs/mcintyre/trago/references
+
+## create tsv files for each cap3 reference
+ 
+cd $REF
+
+awk -F'\t' '$1 = $1 FS "\t" "\t"' Tdu_common_ortho_pipe.bed >Tdu_common_ortho_pipe.tsv
+awk -F'\t' '$1 = $1 FS "\t" "\t"' Tpo_common_ortho_pipe.bed >Tpo_common_ortho_pipe.tsv
+awk -F'\t' '$1 = $1 FS "\t" "\t"' Tpr_common_ortho_pipe.bed >Tpr_common_ortho_pipe.tsv

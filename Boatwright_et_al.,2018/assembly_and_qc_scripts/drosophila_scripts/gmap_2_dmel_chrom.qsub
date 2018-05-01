@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N gmap_trinity
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bigmem
+#PBS -l walltime=48:00:00
+#PBS -l pmem=12GB
+
+module load gmap/20141222
+
+PROJ=/scratch/lfs/mcintyre/trago/dros_test_assembly
+REF=/scratch/lfs/mcintyre/references/dmel_fb557
+
+## gmap trinity+cap3 contigs to dmel chromosome
+gmap -n 0 -t 4 \
+	-d dmel-all-chrom-557 \
+	-D $REF/dmel-all-chrom-557/ \
+	$PROJ/cap3/r324_dros_combined_trinity_and_cap3.fa \
+	--min-intronlength=4 \
+	-f 2 \
+	> $PROJ/gmap/trinity_cap3_contigs_2_dmel_chrom.gtf
+
+## gmap trinity only contigs to dmel chromosome
+gmap -n 0 -t 4 \
+        -d dmel-all-chrom-557 \
+        -D $REF/dmel-all-chrom-557/ \
+        $PROJ/normalized_trinity/r324_dros_combined.Trinity.fasta \
+        --min-intronlength=4 \
+        -f 2 \
+	> $PROJ/gmap/trinity_contigs_2_dmel_chrom.gtf
+
+:<<'END
+
+## gmap dmel 557 transcripts to dmel chromosome
+gmap -n	0 -t 4 \
+        -d dmel-all-chrom-557 \
+        -D $REF/dmel-all-chrom-557/ \
+        $REF/dmel-all-transcript-r5.57.fasta \
+        --min-intronlength=4 \
+        -f 2 \
+        > $PROJ/gmap/dmel_transcripts_2_dmel_chrom.gtf
+
+END

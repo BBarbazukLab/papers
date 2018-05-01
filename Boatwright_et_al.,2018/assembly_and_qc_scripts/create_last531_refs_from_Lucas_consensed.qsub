@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio
+#PBS -l walltime=05:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=2gb
+
+module load samtools
+module load last/531
+
+## Set directories and variables
+PROJ=/scratch/lfs/mcintyre/trago
+REF=/scratch/lfs/mcintyre/trago/references
+
+
+#### Build last index from the consensed sequences
+
+echo `date`": building LAST db for TPR"
+lastdb ${REF}/TPR_consensed_contigs_500-15k_last531 ${REF}/TPR_consensed_contigs_500-15k.fasta
+
+echo `date`": processing TPR complete"
+
+
+echo `date`": building LAST db for TDU"
+lastdb ${REF}/TDU_consensed_contigs_500-15k_last531 ${REF}/TDU_consensed_contigs_500-15k.fasta
+
+echo `date`": processing TDU complete"
+
+echo `date`": building LAST db for TPO"
+lastdb ${REF}/TPO_consensed_contigs_500-15k_last531 ${REF}/TPO_consensed_contigs_500-15k.fasta
+
+echo `date`": processing TPO complete"
+
+
+

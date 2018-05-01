@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /bio/mcintyre/trago/scripts/fastqc/PBS_LOGS/
+#PBS -l walltime=00:30:00
+#PBS -l nodes=1:ppn=4
+#PBS -l pmem=1gb
+#PBS -t 1-6
+
+
+## note that there are 6 fastq files for each trago species
+
+#### Set Directories
+PROJ=/bio/mcintyre/trago
+FILES=$PROJ/trago-tetraploids/Sample_Tms3
+OUTDIR=$PROJ/trago-tetraploids/count_fq
+
+
+#### I am using an SGE Array (pulls out each name from the file and calls it 'design')
+
+## Tm1 fastq files:
+
+DESIGN_FILE=$PROJ/outfiles/fastqc/tetraploids/design_files/list_trago_tetra_Tms3_fq.txt
+DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)  #steps through list_trago_tetra_Tm1_fq.txt by row
+
+cd $FILES
+
+for f in $FILES
+do
+    grep '@HWI' $DESIGN | wc -l > $OUTDIR/fq_cnt_$DESIGN.txt
+done

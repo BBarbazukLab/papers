@@ -1,0 +1,52 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -N IDhom
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/staph_DNA/scripts/PBS_LOGS/
+#PBS -l walltime=12:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=8gb
+
+
+module load python/2.7.3
+
+## Set Directories
+    PROJ=/scratch/lfs/mcintyre/staph_DNA
+    ORIG=$PROJ/original_data
+    OUTLOG=$PROJ/qc/homopolymer/homopolymer_logs
+    OUTPNG=$PROJ/qc/homopolymer/homopolymer_pngs
+    OUTPUT=$PROJ/qc/homopolymer/homopolymer_files
+    SCRIPTS=/scratch/lfs/mcintyre/python.git
+
+    if [ ! -e $OUTLOG ]; then mkdir -p $OUTLOG; fi
+    if [ ! -e $OUTPNG ]; then mkdir -p $OUTPNG; fi
+    if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+# Pull info from design file
+
+DESIGN_FILE=$PROJ/design_files/design_v4.csv
+
+for PBS_ARRAYID in {51..100}   
+do
+    DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1) 
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+    CODE=${ARRAY[0]}
+    FQ=${ARRAY[1]}
+    LANE=${ARRAY[2]}
+    READPAIR=${ARRAY[3]}
+    RUNORDER=${ARRAY[4]}
+    STRAIN=${ARRAY[5]}
+    NAME=${ARRAY[6]}
+
+
+    LOG=$OUTLOG/${STRAIN}_${NAME}.log
+    PNG=$OUTPNG/${STRAIN}_${NAME}.png
+
+    $SCRIPTS/identify_homopolymers.py --input $ORIG/${NAME}.fastq --fastq -a --out $OUTPUT/${STRAIN}_${NAME}.csv --log $LOG --plot $PNG
+
+done
+
+cat $OUTPUT/${STRAIN}_${NAME}.csv >> homopolymer_summary.csv

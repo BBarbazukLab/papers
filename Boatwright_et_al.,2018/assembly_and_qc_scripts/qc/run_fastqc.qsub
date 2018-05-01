@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N fastqc
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -l walltime=2:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=900mb
+#PBS -t 2-37
+
+
+# Load modules
+module load fastqc/0.10.1
+
+#Set directories
+PROJ=/scratch/lfs/mcintyre/trago
+ORIG=/scratch/lfs/mcintyre/trago/original_data/trago-tetraploids
+QC=/scratch/lfs/mcintyre/trago/qc_test
+OUTPUT=$QC/fastqc/fastqc_files
+if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+PDF=$QC/fastqc/fastqc_pdfs
+if [ ! -e $PDF ]; then mkdir -p $PDF; fi
+HTMLDOC=/scratch/lfs/mcintyre/opt/htmldoc-1.8.27/bin/htmldoc
+
+
+## Design file (for paired end reads)
+     DESIGN_FILE=$PROJ/design_files/qc_design_file.csv
+
+     DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+     IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+     READ=${ARRAY[0]}
+     NAME=${ARRAY[1]}
+
+
+
+
+#Run FASTQC
+fastqc ${ORIG}/${READ} --outdir=$OUTPUT
+
+#Convert to PDFs
+READFILE=$(basename ${READ} .fastq)
+$HTMLDOC --webpage --fontsize 7 --browserwidth 800 --header . $OUTPUT/${READFILE}_fastqc/fastqc_report.html -f $PDF/${NAME}.pdf

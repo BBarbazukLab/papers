@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /bio/mcintyre/trago/scripts/fastqc/PBS_LOGS/
+#PBS -l walltime=1:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=4gb
+
+module load python
+
+PROJ=/bio/mcintyre/trago
+DATAIN=$PROJ/trago-tetraploids/Sample_Tms3
+OUTDIR=$PROJ/outfiles/fastqc/tetraploids/duplicates
+
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+cd $DATAIN 
+
+for FQ in $(ls *.fastq)
+do
+
+    NAME=`basename $FQ .fastq`
+
+    python $PROJ/scripts/fastqc/count_total_uniq_fq.py -i $FQ -o $OUTDIR/$NAME.csv
+
+done

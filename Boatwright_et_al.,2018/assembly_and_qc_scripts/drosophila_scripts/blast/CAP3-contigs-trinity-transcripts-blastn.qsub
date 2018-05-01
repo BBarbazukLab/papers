@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast
+#PBS -o Drosophila-cap3-contigs-Trinity-transcripts-blast-all-chromosomes.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=2:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#####PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/blast-contigs-transcripts
+
+OUTDIR=$INDIR/blast-results
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/ 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila-cap3-contigs-Trinity-transcripts-blast-all-chromosomes-LOG.log
+printf "`date` \n\n" > $MYLOG
+
+
+REF=$WORK/$PROJ/dros_outfiles/references/dmel-all-chromosome-r5.30_BLAST
+###REF=$WORK/$PROJ/dros_outfiles/references/dmel-all-transcript-r5.30_BLAST
+READS1=$INDIR/cap3-T-transcripts-zero-plus-F150.fasta
+READS2=$INDIR/cap3-T-contigs-zero-plus-F150.fasta
+READS3=$INDIR/cap3-T10-transcripts-zero-plus-F150.fasta
+READS4=$INDIR/cap3-T10-contigs-zero-plus-F150.fasta   
+READS5=$INDIR/cap3-T10T-transcripts-zero-plus-F150.fasta
+READS6=$INDIR/cap3-T10T-contigs-zero-plus-F150.fasta
+
+OUTFILE1=$OUTDIR/cap3-T-transcripts-zero-plus-F150-blast-all-chromosomes-results-H.tsv
+OUTFILE2=$OUTDIR/cap3-T-contigs-zero-plus-F150-blast-all-chromosomes-results-H.tsv
+OUTFILE3=$OUTDIR/cap3-T10-transcripts-zero-plus-F150-blast-all-chromosomes-results-H.tsv
+OUTFILE4=$OUTDIR/cap3-T10-contigs-zero-plus-F150-blast-all-chromosomes-results-H.tsv
+OUTFILE5=$OUTDIR/cap3-T10T-transcripts-zero-plus-F150-blast-all-chromosomes-results-H.tsv
+OUTFILE6=$OUTDIR/cap3-T10T-contigs-zero-plus-F150-blast-all-chromosomes-results-H.tsv
+
+####blastn -db $REF -query $READS -outfmt 6 > $OUTFILE1
+
+blastn -db $REF -query $READS1 -outfmt 7 > $OUTFILE1
+blastn -db $REF -query $READS2 -outfmt 7 > $OUTFILE2
+blastn -db $REF -query $READS3 -outfmt 7 > $OUTFILE3
+blastn -db $REF -query $READS4 -outfmt 7 > $OUTFILE4
+blastn -db $REF -query $READS5 -outfmt 7 > $OUTFILE5
+blastn -db $REF -query $READS6 -outfmt 7 > $OUTFILE6
+
+2>>$MYLOG

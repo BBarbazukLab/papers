@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -M jfear@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /bio/mcintyre/vermerris_sorghum/scripts/PBS_LOGS/fastqc/
+#PBS -l walltime=5:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=1Gb
+#PBS -t 1-16
+#16
+
+module load fastqc/0.10.1
+
+## Set Directories
+    PROJ=/bio/mcintyre/vermerris_sorghum
+    ORIG=$PROJ/original_data
+    OUTPUT=$PROJ/fastqc
+    if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+    DESIGN_FILE=$PROJ/design_files/sorghum_design1.csv
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    LANE=${ARRAY[0]}
+    BC=${ARRAY[1]}
+    DATE=${ARRAY[2]}
+    NUM=${ARRAY[3]}
+
+    FILE=$ORIG/$LANE/${LANE}_1_${BC}.fastq
+
+    fastqc $FILE --outdir=$OUTPUT

@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=01:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=900mb
+
+
+## clean up sam files so contig numbers match across sam files aligned to different orthos
+
+module load python/2.7.3 
+
+PROJ=/scratch/lfs/mcintyre/trago
+INPUT=$PROJ/trago_output/aln_to_orthos_final_uniq_pipe
+OUTPUT=$PROJ/trago_output/aln_to_orthos_final_uniq_pipe/cleaned_sam_files
+SCRIPTS=$PROJ/scripts
+
+
+## do these 2 first so I can work on sam compare script:
+##    python $SCRIPTS/fix_sam_files_v3.py -i $INPUT/Tm_1_to_Tdu_ortho_pipe.sam -o $OUTPUT/Tm_1_to_Tdu_ortho_pipe.sam
+##    python $SCRIPTS/fix_sam_files_v3.py -i $INPUT/Tm_1_to_Tpo_ortho_pipe.sam -o $OUTPUT/Tm_1_to_Tpo_ortho_pipe.sam
+
+
+cd $INPUT 
+for i in *.sam
+do
+
+    python $SCRIPTS/fix_sam_files_v3.py -i $i -o $OUTPUT/$i
+
+done

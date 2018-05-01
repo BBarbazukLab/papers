@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/outfiles/PBS_LOGS/blast
+#PBS -o Drosophila_trinity_blast_uniprot_1.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=10:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/outfiles/blast
+OUTDIR=$WORK/$PROJ/outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/LOGS/blast 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila_trinity_blast_uniprot_1.log
+printf "`date` \n\n" > $MYLOG
+
+######makeblastdb -in uniprot_sprot.fasta -dbtype 'prot' -out uniprot_sprot_BLAST
+
+REF=$INDIR/uniprot/uniprot_sprot_BLAST
+READS=$INDIR/uniprot/best_candidates.eclipsed_orfs_removed.pep
+OUTFILE=$INDIR/trinity_blast_uniprot_1_results.tsv
+
+blastp -query $READS -db $REF -num_threads 4 -max_target_seqs 1 -outfmt 6 -out $OUTFILE
+
+2>>$MYLOG

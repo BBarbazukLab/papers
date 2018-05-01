@@ -1,0 +1,73 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N sam_parents
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=15:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=160G
+#PBS -q bio
+
+module load python/2.7.3 
+
+#### note using modified sam_compare.py script in my home directory!!!
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+
+OUTPUT=$PROJ/trago_output/ase_counts/parents
+if [ ! -e $OUTPUT ]; then mkdir $OUTPUT; fi
+
+#### Create LOG directory
+LOGS=$OUTPUT/logs
+if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+
+cd $TMPDIR
+
+## TDU reads to TDU and TPR for Tms
+for i in 1 2 3
+do
+
+    ## Doing Tdu -- TDU and TPR alignments for comparing
+    SAMA=$PROJ/trago_output/filtered_parent_sam_files/Tdu_${i}_unq_2_TDU_4_Tms_commonID.sam
+    SAMB=$PROJ/trago_output/filtered_parent_sam_files/Tdu_${i}_unq_2_TPR_4_Tms_commonID.sam
+
+    ### Concatenate reads for use in sam-compare
+    cat ${PROJ}/original_data/Tdu${i}_*.fastq | sed 's/ /_/g' > $TMPDIR/Tdu${i}.fastq
+
+    python /home/ammorse/sam_compare.py \
+        -d \
+	-l 100 \
+        -f $PROJ/references/TDU_tpr_bed_for_sam_compare.bed \
+        -q $TMPDIR/Tdu${i}.fastq \
+        -A $SAMA \
+        -B $SAMB \
+        -c $OUTPUT/ase_counts_Tdu_${i}_2_Tdu_Tpr.csv \
+        -t $OUTPUT/ase_totals_Tdu_${i}_2_Tdu_Tpr.csv \
+        -g $LOGS/ase_counts_Tdu_${i}_2_Tdu_Tpr.log
+done
+
+## TPR reads to TDU and TPR for Tms
+for i in 1 2 3
+do
+
+    ## Doing Tpr -- TDU and TPR alignments for comparing
+    SAMA=$PROJ/trago_output/filtered_parent_sam_files/Tpr_${i}_unq_2_TDU_4_Tms_commonID.sam
+    SAMB=$PROJ/trago_output/filtered_parent_sam_files/Tpr_${i}_unq_2_TPR_4_Tms_commonID.sam
+
+    ### Concatenate reads for use in sam-compare
+    cat ${PROJ}/original_data/Tpr${i}_*.fastq | sed 's/ /_/g' > $TMPDIR/Tpr${i}.fastq
+
+    python /home/ammorse/sam_compare.py \
+        -d \
+	-l 100 \
+        -f $PROJ/references/TPR_tdu_bed_for_sam_compare.bed \
+        -q $TMPDIR/Tpr${i}.fastq \
+        -A $SAMA \
+        -B $SAMB \
+        -c $OUTPUT/ase_counts_Tpr_${i}_2_Tdu_Tpr.csv \
+        -t $OUTPUT/ase_totals_Tpr_${i}_2_Tdu_Tpr.csv \
+        -g $LOGS/ase_counts_Tpr_${i}_2_Tdu_Tpr.log
+done

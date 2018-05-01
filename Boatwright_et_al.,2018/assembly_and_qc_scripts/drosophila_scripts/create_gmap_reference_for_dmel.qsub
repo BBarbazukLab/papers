@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio
+#PBS -l walltime=1:00:00
+#PBS -l pmem=12GB
+
+module load gmap/20141222
+
+## build gmap refererence for dmel
+
+REF=/scratch/lfs/mcintyre/references/dmel_fb557
+OUTPUT=/scratch/lfs/mcintyre/trago/dros_test_assembly
+
+## build gmap non-redundant reference
+#gmap_build -D $REF -d dmel_all_chrom-557 $REF/dmel-all-chromosome-r5.57.fasta
+
+## build gmap reference for dmel transcripts
+gmap_build -D $REF -d dmel-all-transcript-557 $REF/dmel-all-transcript-r5.57.fasta

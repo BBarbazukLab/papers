@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N gmap
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -l walltime=11:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=110gb
+
+
+### align contigs to genome
+
+module load gmap/20141222
+module load python
+
+PROJ=/scratch/lfs/mcintyre/trago/dros_test_assembly
+REF=/scratch/lfs/mcintyre/references/dmel_fb557
+
+OUTPUT=$PROJ/gmap_contigs_to_dmel557
+  if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+## build gmap non-redundant reference
+## gmap_build -D $REF -d dmel-all-chrom-557 $REF/dmel-all-chromosome-r5.57.fasta
+
+
+## align contigs to reference -- Manuel 
+gmap -n 0 -t 4 -d dmel-all-chrom-557 -D /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557 \
+	/scratch/lfs/mcintyre/trago/dros_test_assembly/normalized_trinity/r324_dros_combined.Trinity.fasta \
+	--min-intronlength=4 -f 2 >$OUTPUT/Trinity".gtf"
+

@@ -1,0 +1,12 @@
+ase_counts_Tdu_1_2_Tdu_Tpo.csv
+ase_counts_Tdu_1_2_Tdu_Tpr.csv
+ase_counts_Tdu_2_2_Tdu_Tpo.csv
+ase_counts_Tdu_2_2_Tdu_Tpr.csv
+ase_counts_Tdu_3_2_Tdu_Tpo.csv
+ase_counts_Tdu_3_2_Tdu_Tpr.csv
+ase_counts_Tpo_1_2_Tdu_Tpo.csv
+ase_counts_Tpo_2_2_Tdu_Tpo.csv
+ase_counts_Tpo_3_2_Tdu_Tpo.csv
+ase_counts_Tpr_1_2_Tdu_Tpr.csv
+ase_counts_Tpr_2_2_Tdu_Tpr.csv
+ase_counts_Tpr_3_2_Tdu_Tpr.csv

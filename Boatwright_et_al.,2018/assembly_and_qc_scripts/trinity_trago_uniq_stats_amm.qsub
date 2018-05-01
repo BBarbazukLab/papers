@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -N Trago
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -l nodes=1:ppn=6
+#PBS -l walltime=1:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#PBS -t 1-3
+
+module load trinity
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+INDIR=/scratch/lfs/mcintyre/trago/trago_output/trinity/trinity_10
+
+#### Because I am using an Array I am pulling SPECIES from an external file 
+
+DESIGN_FILE=$PROJ/trago_diploid_species_list.csv
+SPECIES=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+### cd to folder with trinity output 
+cd $INDIR
+
+#### RUN trinity stats 
+TrinityStats.pl ${SPECIES}.Trinity.fasta > Trinity_${SPECIES}_10_stats.txt 

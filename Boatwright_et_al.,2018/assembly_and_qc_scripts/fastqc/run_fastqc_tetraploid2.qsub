@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /bio/mcintyre/trago/scripts/fastqc/PBS_LOGS/fastqc_tetraploid/
+#PBS -l walltime=1:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=1Gb
+#PBS -t 1-6
+
+module load fastqc/0.10.1
+
+## Set Directories
+    PROJ=/bio/mcintyre/trago
+    ORIG=$PROJ/trago-tetraploids/Sample_Tm1
+    OUTPUT=$PROJ/outfiles/fastqc/tetraploids/Sample_Tm1
+    if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+    DESIGN_FILE=$PROJ/scripts/fastqc/design_files/trago_Sample_Tm1_design_file.csv
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    NAME=${ARRAY[0]}
+    BC=${ARRAY[1]}
+    LANE=${ARRAY[2]}
+    RUN=${ARRAY[3]}
+
+    FILE=$ORIG/${NAME}_${BC}_${LANE}_${RUN}_001.fastq
+
+    fastqc $FILE --outdir=$OUTPUT

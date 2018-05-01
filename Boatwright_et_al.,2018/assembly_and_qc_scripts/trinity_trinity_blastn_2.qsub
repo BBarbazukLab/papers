@@ -1,0 +1,51 @@
+#!/bin/bash
+#PBS -N Trinity
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast-trinity-trinity
+#PBS -o Trinity-10-trinity-10-blast.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=1:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#####PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+
+OUTDIR=$WORK/$PROJ/dros_outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+INDIR=$WORK/$PROJ/dros_outfiles/blast-trinity-trinity/with10
+
+LOGS=$OUTDIR/LOGS/blast-trinity-trinity   	#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+
+####OUT1=$INDIR/outfiles
+####if [ ! -e $OUT1 ]; then mkdir -p $OUT1; fi
+
+
+MYLOG=$LOGS/Trinity-10-trinity-10-blast.log
+printf "`date` \n\n" > $MYLOG
+
+######makeblastdb -in dmel-all-transcript-r5.30.fasta -dbtype 'nucl' -out dmel-all-transcript-r5.30_BLAST
+
+REF=$INDIR/Trinity_10_BLAST
+READS=$INDIR/Trinity.fasta
+OUTFILE=$INDIR/Trinity-10-trinity-10-blast-results-H.tsv
+
+blastn -db $REF -query $READS -outfmt 7 > $OUTFILE
+
+2>>$MYLOG

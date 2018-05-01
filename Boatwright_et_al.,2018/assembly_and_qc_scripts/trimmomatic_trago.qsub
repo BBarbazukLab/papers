@@ -1,0 +1,71 @@
+#!/bin/bash
+#PBS -N Trago
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/outfiles/PBS_LOGS/trimmomatic
+#PBS -o trago_trimmomatic_PBS.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=15:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#PBS -t 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53%4
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load trimmomatic
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/outfiles/cutadapt
+OUTDIR=$WORK/$PROJ/outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#### Because I am using an Array I am pulling REP:BARCODE:LANE:READTYPE1:READTYPE2 from an external CSV with all possible combinations
+
+DESIGN_FILE=$WORK/$PROJ/trago_biorep_list.csv
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+REP=${ARRAY[0]}
+BARCODE=${ARRAY[1]}
+LANE=${ARRAY[2]}
+READTYPE1=${ARRAY[3]}
+########READTYPE2=`echo $READTYPE1 | sed 's/\_R1/\_R2/g'`
+READTYPE2="R2"
+
+#### Create LOG directory and start log
+LOGS=$OUTDIR/LOGS/trimmomatic 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+####MYLOG=$LOGS/${REP}_${BARCODE}_${LANE}_${READTYPE1}_${READTYPE2}_001_trimmomatic.log
+####printf "`date` $REP $BARCODE $LANE $READTYPE1 $READTYPE2 SGE_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+TRIMOLOG=$LOGS/${REP}_${BARCODE}_${LANE}_${READTYPE1}_${READTYPE2}_001_trimmomatic.log
+
+#### Start Trimmomatic
+READS1=$INDIR/${REP}_${BARCODE}_${LANE}_${READTYPE1}_001_adapter_trimmed.fq
+READS2=$INDIR/${REP}_${BARCODE}_${LANE}_${READTYPE2}_001_adapter_trimmed.fq
+OUT1=$OUTDIR/trimmomatic
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+TRIM1=$OUT1/${REP}_${BARCODE}_${LANE}_${READTYPE1}_001_trimmomatic_paired.fq
+TRIM2=$OUT1/${REP}_${BARCODE}_${LANE}_${READTYPE1}_001_trimmomatic_unpaired.fq
+TRIM3=$OUT1/${REP}_${BARCODE}_${LANE}_${READTYPE2}_001_trimmomatic_paired.fq
+TRIM4=$OUT1/${REP}_${BARCODE}_${LANE}_${READTYPE2}_001_trimmomatic_unpaired.fq
+
+### Start Lane Section in Log
+####printf "$LANE\n" >> $MYLOG
+
+#### RUN trimmomatic on Paired end Files
+java -classpath $HPC_TRIMMOMATIC_LIB/trimmomatic.jar org.usadellab.trimmomatic.TrimmomaticPE -phred33 -threads 4 -trimlog $TRIMOLOG $READS1 $READS2 $TRIM1 $TRIM2 $TRIM3 $TRIM4 HEADCROP:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:60	
+
+####2>>$MYLOG

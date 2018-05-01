@@ -1,0 +1,7 @@
+Thu Sep 19 14:07:09 EDT 2013
+cat: Tdu_*.fasta: No such file or directory
+cat: Tpo_*.fasta: No such file or directory
+cat: Tpr_*.fasta: No such file or directory
+/var/spool/torque/mom_priv/jobs/585387.moab.ufhpc.SC: line 36: $MYLOG: ambiguous redirect
+/var/spool/torque/mom_priv/jobs/585387.moab.ufhpc.SC: line 43: $MYLOG: ambiguous redirect
+/var/spool/torque/mom_priv/jobs/585387.moab.ufhpc.SC: line 50: $MYLOG: ambiguous redirect

@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -l walltime=01:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=900M
+#PBS -j oe
+#PBS -o /bio/mcintyre/trago/scripts/fastqc/PBS_LOGS/
+#PBS -t 1-54
+#54
+
+#### Set Directories
+PROJ=/bio/mcintyre/trago 
+WORK=$PROJ/outfiles/cutadapt/fastqc
+HTMLDOC=/home/jfear/bin/htmldoc
+
+PDF=$PROJ/outfiles/cutadapt/fastqc_pdf_trimmed
+
+if [ ! -e $PDF ]; then mkdir -p $PDF; fi
+
+#### Because I am using an PBS Array I am pulling LINE:MV:REP from an external CSV with all possible combinations
+DESIGN_FILE=$PROJ/trago_diploid_design_file.csv
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+TYPE=${ARRAY[0]}
+ADAP=${ARRAY[1]}
+LANE=${ARRAY[2]}
+REP=${ARRAY[3]}
+NUM=${ARRAY[4]}
+
+$HTMLDOC --webpage --fontsize 7 --browserwidth 800 --header . $WORK/${TYPE}_${ADAP}_${LANE}_${REP}_${NUM}_adapter_trimmed.fq_fastqc/fastqc_report.html -f $PDF/${TYPE}_${ADAP}_${LANE}_${REP}_${NUM}_adapter_trimmed.pdf 

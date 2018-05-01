@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/qc_pipeline/scripts/adapter_plots.py", line 82, in <module>
+    main()
+  File "/scratch/lfs/mcintyre/qc_pipeline/scripts/adapter_plots.py", line 36, in main
+    adapterContent=pandas.read_csv(args.csvInput, sep=',', header=None, skiprows=1)
+  File "/apps/python/2.7.3/lib/python2.7/site-packages/pandas/io/parsers.py", line 452, in parser_f
+    return _read(filepath_or_buffer, kwds)
+  File "/apps/python/2.7.3/lib/python2.7/site-packages/pandas/io/parsers.py", line 234, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/apps/python/2.7.3/lib/python2.7/site-packages/pandas/io/parsers.py", line 542, in __init__
+    self._make_engine(self.engine)
+  File "/apps/python/2.7.3/lib/python2.7/site-packages/pandas/io/parsers.py", line 679, in _make_engine
+    self._engine = CParserWrapper(self.f, **self.options)
+  File "/apps/python/2.7.3/lib/python2.7/site-packages/pandas/io/parsers.py", line 1041, in __init__
+    self._reader = _parser.TextReader(src, **kwds)
+  File "parser.pyx", line 488, in pandas.parser.TextReader.__cinit__ (pandas/parser.c:4494)
+ValueError: No columns to parse from file

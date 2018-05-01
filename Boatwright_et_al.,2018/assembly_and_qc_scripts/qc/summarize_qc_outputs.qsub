@@ -1,0 +1,76 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N summarize_qc
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -l walltime=1:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=4gb
+#PBS -t 1
+
+#Set directories
+PROJ=/scratch/lfs/mcintyre/trago
+QC=/scratch/lfs/mcintyre/trago/qc_test
+ORIG=/scratch/lfs/mcintyre/trago/original_data/trago-tetraploids
+
+DUP=$QC/duplicate_counts
+HP=$QC/homopolymer_files
+ADAPT=$QC/qc_adapters/files
+
+
+DUPOUT=$QC/duplicate_summary.csv
+HPOUT=$QC/homopolymer_summary.csv
+ADAPTOUT=$QC/adapter_summary.csv
+
+
+### Combine duplicate summaries
+
+cd $DUP
+FLAG=0
+for FILE in *.csv
+do
+      if [ $FLAG == 0 ]
+      then
+          cat $FILE | sed -e "s/_duplicate_counts_summary.csv//g" > $DUPOUT
+          FLAG=1
+      else
+          tail -n +2 $FILE | sed -e "s/_duplicate_counts_summary.csv//g" >> $DUPOUT
+      fi
+done
+
+
+### Combine homopolymer summaries
+
+ORIGPATH=$( echo \$ORIG/ | sed -e "s/\//\\\\\//g")
+cd $HP
+FLAG=0
+for FILE in *.csv
+do
+      if [ $FLAG == 0 ]
+      then
+          cat $FILE | sed -e "s/${ORIGPATH}//g" > $HPOUT
+          FLAG=1
+      else
+          tail -n +2 $FILE | sed -e "s/${ORIGPATH}//g" >> $HPOUT
+      fi
+done
+
+
+### Combine adapter summaries
+
+cd $ADAPT
+FLAG=0
+for FILE in *.csv
+do
+      if [ $FLAG == 0 ]
+      then
+          cat $FILE > $ADAPTOUT
+          FLAG=1
+      else
+          tail -n +2 $FILE >> $ADAPTOUT
+      fi
+done
+
+

@@ -1,0 +1,51 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast_rev
+#PBS -o Drosophila-against-trinity-10-blast.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=2:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#####PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/references
+OUTDIR=$WORK/$PROJ/dros_outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/LOGS/blast_rev 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila-against-trinity-10-blast.log
+printf "`date` \n\n" > $MYLOG
+
+######makeblastdb -in dmel-all-transcript-r5.30.fasta -dbtype 'nucl' -out dmel-all-transcript-r5.30_BLAST
+######makeblastdb -in /bio/mcintyre/trago/dros_outfiles/trinity_10/Trinity.fasta -dbtype 'nucl' -out /bio/mcintyre/trago/dros_outfiles/blast_rev/with10/Trinity_10_BLAST
+OUT1=$OUTDIR/blast_rev/with10
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+REF=$OUT1/Trinity_10_BLAST
+READS=$INDIR/dmel-all-transcript-r5.30.fasta
+OUTFILE=$OUT1/Drosophila-against-trinity-10-blast-results.tsv
+
+blastn -db $REF -query $READS -outfmt 7 > $OUTFILE
+
+2>>$MYLOG

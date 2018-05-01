@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/cap3
+#PBS -o Drosophila-cap3-combined.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=30:00:00
+#PBS -l pmem=20gb
+#PBS -q bio
+######PBS -t 1,2%1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load cap3
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/cap3-combined
+
+
+#### Create LOG directory and start log
+LOGS=$WORK/$PROJ/dros_outfiles/LOGS/cap3 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila-cap3-combined.log
+printf "`date` \n\n" > $MYLOG
+
+
+#### Start cap3
+
+READS=$INDIR/Trinity-Trinity-10-combined.fasta
+OUTFILE=$INDIR/Trinity-Trinity-10-combined.fasta.out
+
+#### Run CAP3
+
+cap3   $READS  >  $OUTFILE &>>$MYLOG

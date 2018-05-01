@@ -1,0 +1,87 @@
+#!/bin/bash
+#PBS -N Trago
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/outfiles/PBS_LOGS/
+#PBS -o trago_cutadapt_PBS.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=10:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#PBS -t 1-53%1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load cutadapt
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/trago_data
+OUTDIR=$WORK/$PROJ/outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#### Because I am using an Array I am pulling LINE:MV:REP from an external CSV with all possible combinations
+
+DESIGN_FILE=$WORK/$PROJ/trago_biorep_list_2.csv
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+REP=${ARRAY[0]}
+BARCODE=${ARRAY[1]}
+LANE=${ARRAY[2]}
+READTYPE=${ARRAY[3]}
+
+#### Create LOG directory and start log
+LOGS=$OUTDIR/LOGS  	#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/${REP}_${BARCODE}_${LANE}_${READTYPE}_001_cutadapt.log
+printf "`date` $REP $BARCODE $LANE $READTYPE SGE_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+#### Start Cutadapt Trimmer
+READS=$INDIR/${REP}_${BARCODE}_${LANE}_${READTYPE}_001.fastq
+OUT1=$OUTDIR/cutadapt
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+### Start Lane Section in Log
+printf "$LANE\n" >> $MYLOG
+
+#### RUN cutadapt
+REM=$(($PBS_ARRAYID % 2))
+if [ ${REM} -ne 0 ]
+then
+#### RUN cutadapt on Pair1 Files
+	cutadapt \
+	    --error-rate=0.1 \
+	    --times=1 \
+	    --overlap=5 \
+	    --minimum-length=0 \
+	    --adapter=GATCGGAAGAGCACACGTCT \
+	    --front=TACACGACGCTCTTCCGATC \
+	    --quality-base=33 \
+	    --output=$OUT1/${REP}_${BARCODE}_${LANE}_${READTYPE}_001_adapter_trimmed.fq \
+	    $READS \
+	2>>$MYLOG	
+else	    
+#### RUN cutadapt on Pair2 Files
+    cutadapt \
+	--error-rate=0.1 \
+	--times=1 \
+	--overlap=5 \
+	--minimum-length=0 \
+	--adapter=GATCGGAAGAGCGTCGTGTA \
+	--front=AGACGTGTGCTCTTCCGATC \
+	--quality-base=33 \
+	--output=$OUT1/${REP}_${BARCODE}_${LANE}_${READTYPE}_001_adapter_trimmed.fq \
+	$READS \
+    2>>$MYLOG
+fi

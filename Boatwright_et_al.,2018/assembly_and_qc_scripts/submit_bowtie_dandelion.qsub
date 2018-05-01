@@ -1,0 +1,31 @@
+
+#!/bin/bash
+#$ -M ammorse@ufl.edu
+#$ -m n
+#$ -r n
+#$ -l h_rt=24:00:00
+#$ -o /sandbox/ammorse/dandelion/bowtie_output/bowtie_logs
+#$ -l h_vmem=30G
+#$ -j y
+#$ -t 1-117:1
+##117
+
+#### Set Directories
+PROJ=/sandbox/ammorse/dandelion
+WORK=$PROJ/bowtie_output
+DATAIN=$PROJ/data_split_by_barcode
+REF=/sandbox/ammorse/references
+
+
+#### I am using an SGE Array (pulls out each name from the file and calls it 'design')
+DESIGN_FILE=$DATAIN/file_list.txt
+DESIGN=$(cat $DESIGN_FILE | head -n $SGE_TASK_ID | tail -n 1)  #steps through file_list.txt by row
+OUTNAME=`basename $DESIGN .txt`
+
+echo "$OUTNAME, align reads that don't align to ERCC controls to dandelion"
+
+#note that bowtie sam file is piped to bit of perl script that removes unaligned reads from sam alignment
+
+bowtie --chunkmbs 1040 --sam -n 2 -e 70 -l 29 -m 1 --best --strata --tryhard --un $WORK/unaln_dandelion_$OUTNAME.fq --max $WORK/ambig_dandelion_$OUTNAME.fq $REF/taraxacum_officinale $WORK/unaln_ERCC_$OUTNAME.fq | perl -ne 'if (/^@/) {next} @s = split; if ($s[1] != 4) {print}' >$WORK/aln_dandelion_$OUTNAME.sam
+
+

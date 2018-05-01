@@ -1,0 +1,30 @@
+
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -q bio
+#PBS -l walltime=1:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=1gb
+#PBS -j oe
+#PBS -o /project/mcintyre/dandelion_2012_HiSeq/
+
+
+PROJ=/project/mcintyre/dandelion_2012_HiSeq
+DATAIN=$PROJ/fastqc
+OUTDIR=$PROJ/fastqc_summary/files
+
+cd $DATAIN
+
+for DIR in $( find ./ -maxdepth 1 -type d | cut -f2 -d'/')
+do 
+
+	cd $DATAIN/$DIR
+
+	NAME=$(basename "$DIR" _fastqc)
+
+	    perl /project/mcintyre/dandelion_2012_HiSeq/scripts/fastqc_stats.pl $NAME $OUTDIR
+
+done
+

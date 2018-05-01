@@ -1,0 +1,43 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=01:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=900mb
+
+module load python/2.7.3 
+
+PROJ=/scratch/lfs/mcintyre/trago
+LOGS=$PROJ/trago_output/aln_parents_to_consensed/aln_logs
+SCRIPTS=/scratch/lfs/mcintyre/python.git
+
+for J in TDU TPO TPR 
+do
+
+        DESIGN_FILE=$PROJ/design_files/trago_spec_only_with_capitals_reps.txt
+        DESIGN=$(sed -n "${I}p" $DESIGN_FILE)
+
+        IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+        SP_CAP=${ARRAY[0]}
+        SP=${ARRAY[1]}
+        REP=${ARRAY[2]}
+
+        echo "$SP" "$REP"        
+
+        MYLOG=$LOGS/summary_${SP}_${REP}_2_${J}.log    
+        if [ -s $LOGS/${SP}_${REP}_2_${J}_bowtie.log ]
+        then
+	    echo "Parsing log files"
+            python $SCRIPTS/logParser.py \
+                -bowtie $LOGS/${SP}_${REP}_2_${J}_bowtie.log \
+                -last $LOGS/${SP}_${REP}_2_${J}_LAST.log \
+                -treatment $SP $REP \
+                -o $LOGS/aln_summary_${SP}_${REP}_2_${J}.csv
+        fi
+
+done

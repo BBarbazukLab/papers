@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N cap3_Tpo
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -j oe
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=90:00:00
+#PBS -l pmem=20gb
+#PBS -q bio
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load cap3
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+INDIR=$PROJ/trago_output/trag_normalized_trinity_SC
+OUTDIR=$PROJ/trago_output/cap3/TPO
+
+## cat with and outout 10 bp together
+cat $INDIR/Tpo_*.fasta >$OUTDIR/Tpo_norm_combined.Trinity.fasta
+
+
+#### (2) Start cap3 on TPO combined
+
+	READS=$OUTDIR/Tpo_norm_combined.Trinity.fasta
+	OUTFILE=$OUTDIR/cap3_Tpo_combined.fasta.out
+
+	cap3 $READS >$OUTFILE
+

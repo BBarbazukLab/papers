@@ -1,0 +1,22 @@
+#!/bin/bash 
+
+#generate fastqc files
+
+PROJ=/bio/mcintyre/trago
+DATAIN=$PROJ/trago_data
+OUT=$PROJ/outfiles/fastqc/diploids
+
+module load fastqc
+
+cd $DATAIN
+
+## output a list of files and step through that list.
+
+ls > $PROJ/list_fq_files_diploids.txt 
+
+for FILE in {1..54} #there are 48 files in the list
+do
+	DESIGN=$(sed -n "${FILE}p" $PROJ/list_fq_files_diploids.txt)  #steps through list_fq_files_diploids.txt by row
+
+	fastqc $DESIGN --outdir=$OUT
+done

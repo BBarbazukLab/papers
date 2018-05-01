@@ -1,0 +1,37 @@
+#!/bin/bash
+#PBS -N diabetes-g
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/diabetes/PBS_LOGS
+#PBS -o Diabetes-gunzip.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=10:00:00
+#PBS -l pmem=10gb
+#PBS -q bio
+#####PBS -t 1,2%1
+
+#unzip fastqc.gz files
+
+PROJ=/bio/mcintyre/diabetes
+DATAIN=$PROJ/PC2009
+####OUT=$PROJ/unzipped
+
+cd $DATAIN
+
+## output a list of files and step through that list.
+
+ls *.gz > $PROJ/list-fastqgz-files.txt
+
+#####ls > $PROJ/list_fastqgz_files.txt 
+
+for FILE in {1..10048} #there are 10048 files in the list
+do
+
+DESIGN=$(cat $PROJ/list-fastqgz-files.txt | head -n $FILE | tail -n 1)  #steps through list-fastqgz-files.txt by row
+
+gunzip $DESIGN 
+
+done
+

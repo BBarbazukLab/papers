@@ -1,0 +1,118 @@
+#!/bin/bash
+#PBS -M s.lawrence@ufl.edu
+#PBS -m n
+#PBS -N tragoTDU
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/aln_tdu
+#PBS -l walltime=04:00:00
+#PBS -l nodes=1:ppn=4
+#PBS -l pmem=6gb
+#PBS -t 
+
+## Align all reps to the TDU reference 
+
+module load bowtie/0.12.9
+module load last/247
+module load python/2.7.3
+
+## Store number of processors that will be used, i.e. the number of files we will split into to run LAST on
+    NUMPROCS=4
+
+## Set Directories
+    PROJ=/scratch/lfs/mcintyre/arbeitman_ribotag
+    #ORIG=$PROJ/original_data/Nicole_Newell-08-16-2013/Project_RiboTag/fastq_cat
+
+## We are aligning only the unique reads at this point 
+    ORIG=$PROJ/unique_reads
+ 
+## Get info from design file. Need a design file with unaligned reads from step 1 (aligning to junctions)
+    DESIGN_FILE=$PROJ/design_files/new_design_file.txt
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+    NAME=`basename "$DESIGN" .fastq`
+
+## Set Different References
+    REF=/scratch/lfs/mcintyre/references/dmel_fb551/dmel-non-redundant-r5.51_fusions_BT1
+    LASTREF=/scratch/lfs/mcintyre/references/dmel_fb551/dmel-non-redundant-r5.51_fusions_LAST
+
+## Create Necessary Folders
+    OUTPUT=$PROJ/aln_genome_uniq
+    if [ ! -e $OUTPUT ] ; then mkdir -p $OUTPUT; fi
+
+    # Create JOB LOG directory and start log
+        LOGS=$OUTPUT/job_logs 
+        ALN_ERROR_LOG=$LOGS/size_errors.txt
+        if [ ! -d $LOGS ]; then mkdir -p $LOGS; fi
+
+        MYLOG=$LOGS/${NAME}.log
+        printf "`date` $NAME PBS_ARRAYID:$PBS_ARRAYID HOSTNAME:$HOSTNAME\n" > $MYLOG
+    # Create ALN LOG directory
+        ALNLOGS=$OUTPUT/aln_logs 
+        if [ ! -d $ALNLOGS ]; then mkdir -p $ALNLOGS; fi
+
+    # Create UNALN READ directory
+        UNALNDIR=$OUTPUT/unaln_reads
+        if [ ! -d $UNALNDIR ]; then mkdir -p $UNALNDIR; fi
+
+# Select TMPDIR
+    # Create a temporary folder to do everything in. If you comment this section
+    # out, script will use node's local TMPDIR
+    SIZE=`df /local/scratch/ | grep -v "Filesystem" | awk '{print $4}'`
+    FLAG_SCRATCH=0
+    #SIZE=1
+
+    if [ $SIZE -lt 20000000 ]
+    then 
+        echo "TMPDIR full, moving to SCRATCH">>$MYLOG
+        TMPDIR=/scratch/hpc/$USER/tmp/aln_fb551_non-redundant_fusions_$PBS_ARRAYID
+        if [ ! -d $TMPDIR ]; then mkdir -p $TMPDIR; fi
+        FLAG_SCRATCH=1
+    fi
+    printf "\----tmpdir: $TMPDIR \n"> $MYLOG
+
+
+### FUNCTIONS FOR ALIGNMENT PIPELINE ###
+# I have created a separate file that hold the alignment functions
+source $PROJ/scripts/alignment_functions.sh
+
+## Start Alignment Pipeline
+    printf "<------------------- STARTING SE alignment process for $NAME [`date`] ------------------->\n" >> $MYLOG
+    READS=$ORIG/${NAME}_uniq.fq
+
+    qual=`python /scratch/lfs/mcintyre/python.git/identify_quality.py -i $READS`
+    if [ $qual == 'phred64' ]; 
+    then 
+        # set to old illumina quality scores phred64/solexa 1.3
+        btqual='--phred64-quals'
+        lastqual='3'
+    else
+        # change to sanger format which is what all new illumina data is
+        btqual='--phred33-quals'
+        lastqual='1'
+    fi
+
+    bowtie_se_uniq
+    last_se_uniq
+
+
+## Combine all Sam files 
+    echo "START Combine SAM files">>$MYLOG
+    cat *.sam >$OUTPUT/${NAME}.sam 2>>$MYLOG
+    echo "FINISH Combining SAM files [`date`]" >>$MYLOG
+
+## Combine all Unaln FASTQ 
+#    echo "START Combine Unaln FQ">>$MYLOG
+#    cat *_unaln_bt.fq >$UNALNDIR/${NAME}_unaln.fq 2>>$MYLOG
+#    echo "FINISH Combining SAM files [`date`]" >>$MYLOG
+
+## Remove TMPDIR if on SCRATCH
+    DEL_TMP=1
+    if [[ $FLAG_SCRATCH -eq 1 && $DEL_TMP -eq 1 ]]
+    then
+        cd ~
+        rm -r $TMPDIR
+    fi
+
+echo "Script complete, [`date`]" >>$MYLOG

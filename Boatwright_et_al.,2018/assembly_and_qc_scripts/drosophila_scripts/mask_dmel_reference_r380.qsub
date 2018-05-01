@@ -1,0 +1,71 @@
+#!/bin/bash
+#PBS -M jfear@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio 
+#PBS -l walltime=1:00:00
+#PBS -l pmem=3GB
+#PBS -t 217-222
+
+module load bowtie
+module load samtools
+module load last/247
+
+# generates "masked" genome and fusions based on the dmel 5.30 fusion .bed file and outputs new "masked" reference genome
+
+## Set directories and variables
+WORK=/bio/mcintyre/cegs
+REF=/bio/mcintyre/cegs/references
+DREF=/bio/mcintyre/references/dmel_fb530
+
+## Using SGE Array to pull in ref from external csv with list (1 at 1st) 
+DESIGN_FILE=$WORK/CEGS_list_biorep.csv
+DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+LINE=${ARRAY[0]}
+MV=${ARRAY[1]}
+REP=${ARRAY[2]}
+
+
+## Create directories (genome and fusion)
+if [ ! -d ${REF}/masked_genomes ]; then mkdir ${REF}/masked_genomes &>/dev/null; fi
+if [ ! -d ${REF}/masked_genomes/${LINE} ]; then mkdir ${REF}/masked_genomes/${LINE} &>/dev/null; fi
+
+if [ ! -d ${REF}/masked_fusions ]; then mkdir ${REF}/masked_fusions &>/dev/null; fi
+if [ ! -d ${REF}/masked_fusions/${LINE} ]; then mkdir ${REF}/masked_fusions/${LINE} &>/dev/null; fi
+
+
+echo `date`": processing ${LINE}"
+
+#### Mask theFB5.30 genome changing ref bases to "N" when there is a SNP
+
+echo `date`": generating masked genome for ${LINE}"
+perl ${WORK}/scripts/mask_snps_in_genome_with_N_sas_filtering.pl -g ${DREF}/dmel-all-chromosome-r5.30.fasta -v ${WORK}/ase_SNP_filtered_vcf_files/w11182${LINE}_vcf_MSKD.vcf >${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome.fasta
+	
+
+#### "Slice" theFB5.30 fusion sequences from the FB5.30 reference
+
+echo `date`": generating masked fusions for ${LINE}"
+perl ${WORK}/scripts/bed2fasta.pl -r ${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome.fasta ${DREF}/dmel-all-r5.30_fusions.bed >${REF}/masked_fusions/${LINE}/w1118_2_${LINE}_masked_fusions.fasta
+
+	
+#### Build indexes from the references
+
+echo `date`": building bowtie index for ${LINE}"
+bowtie-build ${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome.fasta ${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome &>${REF}/masked_genomes/w1118_2_${LINE}_genomes_bowtie_build.log
+bowtie-build ${REF}/masked_fusions/${LINE}/w1118_2_${LINE}_masked_fusions.fasta ${REF}/masked_fusions/${LINE}/w1118_2_${LINE}_masked_fusions &>${REF}/masked_genomes/w1118_2_${LINE}_fusions_bowtie_build.log
+
+
+echo `date`": building samtools index for ${REF}"
+samtools faidx ${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome.fasta
+samtools faidx ${REF}/masked_fusions/${LINE}/w1118_2_${LINE}_masked_fusions.fasta
+
+echo `date`": building LAST db for ${REF}"
+lastdb ${REF}/masked_fusions/${LINE}/w1118_2_${LINE}_masked_fusions ${REF}/masked_fusions/${LINE}/w1118_2_${LINE}_masked_fusions.fasta
+lastdb ${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome ${REF}/masked_genomes/${LINE}/w1118_2_${LINE}_masked_genome.fasta
+
+echo `date`": processing ${LINE} complete"
+	

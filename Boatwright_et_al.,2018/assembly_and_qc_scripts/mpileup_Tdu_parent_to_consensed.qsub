@@ -1,0 +1,68 @@
+#!/bin/bash
+#PBS -M alisonmmorse@gmail.com
+#PBS -m ae
+#PBS -r n
+#PBS -l walltime=48:00:00
+#PBS -l nodes=1:ppn=4
+#PBS -l pmem=20gb
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -q bigmem
+#PBS -t 1
+### 3 parents and 3 reps per parent = 9
+     ## 1-3 are Tdu
+     ## 4-6 are Tpo
+     ## 7-9 are Tpr
+
+## mpileups for Tdu reads aligned to Tpo and Tpr
+
+module load samtools/0.1.19
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+
+#### Because I am using an PBS Array I am pulling LINE from an external txt file
+DESIGN_FILE=$PROJ/design_files/trago_spec_only_with_capitals_reps.txt
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+SP_CAP=${ARRAY[0]}
+SP=${ARRAY[1]}
+REP=${ARRAY[2]}
+
+for i in TPR 
+  do  
+    REF=$PROJ/references/${i}_consensed_contigs_500-15k.fasta
+
+    SAM=$PROJ/trago_output/aln_parents_to_consensed/${SP}_${REP}_uniq_2_${i}.sam
+
+#### Create OUTPUT directory if needed.
+    OUTPUT=${PROJ}/trago_output/mpileups_bt_parents_2_consensed
+    if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+#### Create LOG directory and start log
+    LOGS=$OUTPUT/logs
+    if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+    MYLOG=$LOGS/${SP}_${REP}_2_${i}_mpileup.log
+
+#### Convert SAM to BAM
+    BAM=$PROJ/trago_output/bam_files/${SP}_${REP}_bt_2_${i}
+
+    echo `date`": Starting SAM to BAM conversion" > $MYLOG
+    samtools view -ut $REF.fai -o $BAM.bam $SAM 2>>$MYLOG 
+    samtools sort -m 10000000000 $BAM.bam $BAM.sorted 2>>$MYLOG
+    samtools index $BAM.sorted.bam  >>$MYLOG
+    echo `date`": Finished SAM to BAM conversion" >> $MYLOG
+
+#### Make mpileup
+    PILEUP=$OUTPUT/${SP}_${REP}_bt_aln_2_${i}.mpileup
+
+    printf "`date` $SP PBS_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" >> $MYLOG
+
+    echo `date`": Generating pileup" >> $MYLOG
+
+    samtools mpileup -d 10000000000 -f $REF $BAM.sorted.bam  > $PILEUP 2>> $MYLOG
+
+    echo `date`": Finished" >> $MYLOG
+
+  done

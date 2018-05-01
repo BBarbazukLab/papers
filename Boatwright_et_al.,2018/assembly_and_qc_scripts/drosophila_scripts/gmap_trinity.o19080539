@@ -1,0 +1,20 @@
+GMAP version 2014-12-22 called with args: gmap -n 0 -t 4 -d dmel-all-chrom-557 -D /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557/ /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-transcript-r5.57.fasta --min-intronlength=4 -f 2
+Checking compiler assumptions for popcnt: 6B8B4567 __builtin_clz=1 __builtin_ctz=0 __builtin_popcount=17 
+Checking compiler assumptions for SSE2: 6B8B4567 327B23C6 xor=59F066A1
+Finished checking compiler assumptions
+Note: >1 sequence detected, so index files are being memory mapped.
+  GMAP can run slowly at first while the computer starts to accumulate
+  pages from the hard disk into its cache.  To copy index files into RAM
+  instead of memory mapping, use -B 3, -B 4, or -B 5, if you have enough RAM.
+  For more speed, also try multiple threads (-t <int>), if you have multiple processors or cores.
+Pre-loading compressed genome (oligos).....,...,...,...,...,...,...,...,..done (63,276,204 bytes, 15449 pages, 0.59 sec)
+Pre-loading compressed genome (bits).....,...,...,...,...,...,...,...,..done (63,276,240 bytes, 15449 pages, 0.12 sec)
+Looking for index files in directory /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557/
+  Pointers file is dmel-all-chrom-557.ref153offsets64meta
+  Offsets file is dmel-all-chrom-557.ref153offsets64strm
+  Positions file is dmel-all-chrom-557.ref153positions
+Offsets compression type: bitpack64
+Allocating memory for ref offset pointers, kmer 15, interval 3...done (134,217,744 bytes, 0.34 sec)
+Allocating memory for ref offsets, kmer 15, interval 3...done (226,957,888 bytes, 0.68 sec)
+Pre-loading ref positions, kmer 15, interval 3........................................................................................done (215,786,916 bytes, 52683 pages, 0.25 sec)
+Processed 30306 queries in 1364.28 seconds (22.21 queries/sec)

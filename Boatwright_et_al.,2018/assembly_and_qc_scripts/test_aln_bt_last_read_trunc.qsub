@@ -1,0 +1,156 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/aln_2_lucas_consensed_contigs
+#PBS -l walltime=24:00:00
+#PBS -l nodes=1:ppn=4
+#PBS -l pmem=40gb
+#PBS -q bigmem
+#PBS -t 1
+     ## 1-3 are Tdu
+     ## 4-6 are Tpo 
+     ## 7-9 are Tpr
+
+### align TDU reads to TPR
+
+module load bowtie/0.12.9
+module load last/247
+module load python/2.7.3
+
+#### Store number of processors used -- i.e. number of files to split into to run LAST
+    NUMPROCS=4
+
+## Set directories
+    PROJ=/scratch/lfs/mcintyre/trago
+    ORIG=$PROJ/original_data
+
+    OUTPUT=$PROJ/trago_output/test_aln_bowtie_last
+    if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+    ALN_LOGS=$OUTPUT/aln_logs
+    if [ ! -e $ALN_LOGS ]; then mkdir -p $ALN_LOGS; fi
+
+## Pull info from design file
+    DESIGN_FILE=$PROJ/design_files/trago_spec_only_with_capitals_reps.txt
+    DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    SP_CAP=${ARRAY[0]}
+    SP=${ARRAY[1]}
+    REP=${ARRAY[2]}
+
+## Reference
+    REF=$PROJ/references/TPR_consensed_contigs_500-15k
+    LASTREF=$PROJ/references/TPR_consensed_contigs_500-15k_last
+
+#### Create LOG directory and start log
+    LOGS=$OUTPUT/job_logs              #script log information
+    ALN_ERROR_LOG=$LOGS/size_errors.txt
+    if [ ! -d $LOGS ]; then mkdir -p $LOGS; fi
+
+    MYLOG=$LOGS/${SP}_${REP}_TPR_consensus.log
+    printf "`date` $SP SGE_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+    ALNLOGS=$OUTPUT/aln_logs       
+    if [ ! -d $ALNLOGS ]; then mkdir -p $ALNLOGS; fi
+
+
+#### for each species, cat together R1 and R2 (treating as single end) and lanes (reps separate)
+    cat ${PROJ}/original_data/${SP}${REP}_*.fastq | head -100000 > $OUTPUT/${SP}_${REP}.fastq
+
+    READS=$OUTPUT/${SP}_${REP}.fastq
+
+#### Determine my quality FASTQ score type
+    qual=`python /scratch/lfs/mcintyre/python.git/identify_quality.py -i $READS`
+    if [ $qual == 'phred64' ];
+    then
+        # set to old illumina quality scores phred64/solexa 1.3
+        btqual='--phred64-quals'
+        lastqual='3'
+    else
+        # change to sanger format which is what all new illumina data is
+        btqual='--phred33-quals'
+        lastqual='1'
+        fi
+
+    cd $TMPDIR
+
+#### run bowtie uniq
+    echo "START Single End bowtie with 3 mm [`date`]" >>$MYLOG
+    bowtie -S \
+           $btqual \
+           --best \
+           --tryhard \
+           --strata \
+           --chunkmbs 1024 \
+           --sam-no-qname-trunc \
+           -p $NUMPROCS \
+           -m 1 \
+           -v 3 \
+           --un $OUTPUT/${SP}_${REP}_unaln_bt.fq \
+           --max $OUTPUT/${SP}_${REP}_ambig_bt.fq \
+           $REF \
+           $READS \
+           2>$ALNLOGS/${SP}_${REP}_2_TPR_bowtie.log \
+           | perl -ne 'if(/^@/){next} @s = split("\t"); if($s[1] != 4) {print}' \
+           > $OUTPUT/${SP}_${REP}_aln_bt.sam \
+           2>>$MYLOG
+        echo "FINISH Single End bowtie [`date`]" >>$MYLOG
+
+        if [ ! -e $OUTPUT/${SP}_${REP}_unaln_bt.fq ]
+        then
+            echo "WARNING: There were no unaligned reads" >> $MYLOG
+        fi
+
+        cat $OUTPUT/${SP}_${REP}_unaln_bt.fq  $OUTPUT/${SP}_${REP}_ambig_bt.fq > $TMPDIR/${SP}_${REP}.fq
+        READS=$TMPDIR/${SP}_${REP}.fq
+
+#### LAST all
+
+    # The following Python script turns READS into NUMPROCS separate files, going from 0-split.fq to (NUMPROCS-1)-split.fq. 
+    # READS is the location where the output files are placed
+
+        python /scratch/lfs/mcintyre/python.git/SeparateLast.py $READS $NUMPROCS
+
+    # START LAST for each of the NUMPROCS new -split files
+        echo "START Single End LAST [`date`]" >>$MYLOG
+        for ((I=0; I<$NUMPROCS; I++))
+        do
+                READS=${I}-split.fq
+
+                lastal \
+                    -l 25 \
+                    -Q $lastqual \
+                    $LASTREF \
+                    $READS \
+                    2>>$MYLOG \
+                    >${I}_last.maf &
+        done
+        wait
+
+        echo "FINISH Single End LAST [`date`]" >>$MYLOG
+
+        rm *-split.fq
+
+    # Convert MAF to SAM
+        echo "START Converting from MAF to SAM [`date`]" >>$MYLOG
+        for ((I=0; I<$NUMPROCS; I++))
+        do
+            maf-convert.py sam ${I}_last.maf > ${I}_last.sam 2>>$MYLOG &
+        done
+        wait
+
+    #    rm *_last.maf
+	cat ${I}_last.maf >> $OUTPUT/${SP}_${REP}_last.maf
+ 	rm ${I}_last.maf
+
+        echo "FINISH Converting to SAM [`date`]" >>$MYLOG
+
+        for ((I=0; I<$NUMPROCS; I++))
+        do
+            cat ${I}_last.sam >> $OUTPUT/${SP}_${REP}_last.sam
+            rm ${I}_last.sam
+        done
+

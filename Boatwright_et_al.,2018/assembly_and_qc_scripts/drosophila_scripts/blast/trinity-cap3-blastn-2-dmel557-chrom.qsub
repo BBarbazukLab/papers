@@ -1,0 +1,46 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast
+#PBS -o Drosophila-cap3-blast-chromosomes.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=5:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+
+
+## blast dros trinity-cap3 contigs against dros crhom 557
+
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+OUTDIR=/scratch/lfs/groups/mcintyre_conesa_transvar/dros_test_assembly/blast
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/ 		#script log information
+if [ ! -e $LOGS ]; then mkdir -p $LOGS; fi
+
+MYLOG=$LOGS/Trin-cap3-blast-all-chromosomes.log
+printf "`date` \n\n" > $MYLOG
+
+## create dmel 557 blast reference
+makeblastdb -in $WORK/references/dmel_557dmel-all-chromosome-r5.57.fasta \
+	-dbtype 'nucl' \
+	-out $WORK/references/dmel_557dmel-all-chromosome-r5.57_BLAST
+
+REF=$WORK/references/dmel_557dmel-all-chromosome-r5.57_BLAST
+
+CONTIGS=$WORK/$PROJ/dros_test_assembly/cap3/r324_dros_combined_trinity_and_cap3.fa
+
+OUTFILE=$OUTDIR/trinity-cap3-blast-2-all-chromosomes.tsv
+
+blastn -db $REF -query $CONTIGS -outfmt 6 > $OUTFILE
+
+2>>$MYLOG
+

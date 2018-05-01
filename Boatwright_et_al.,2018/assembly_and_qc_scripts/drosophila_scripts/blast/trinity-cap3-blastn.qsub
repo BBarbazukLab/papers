@@ -1,0 +1,59 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast
+#PBS -o Drosophila-cap3-blast-chromosomes.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=5:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#####PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/cap3/blast
+
+OUTDIR=$WORK/$PROJ/dros_outfiles/cap3/blast
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/ 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila-cap3-blast-all-chromosomes-LOG.log
+printf "`date` \n\n" > $MYLOG
+
+####REF1=$WORK/$PROJ/dros_outfiles/references/dmel-all-transcript-r5.30_BLAST
+REF1=$WORK/$PROJ/dros_outfiles/references/dmel-all-chromosome-r5.30_BLAST
+####REF2=$INDIR/Trinity-cap3_BLAST
+####REF3=$INDIR/Trinity-10-cap3_BLAST
+READS1=$INDIR/Trinity-cap3-zero-and-filtered.fasta
+READS2=$INDIR/Trinity-10-cap3-zero-and-filtered.fasta
+#####READS1=$INDIR/Trinity-cap3-cat.fasta
+#####READS2=$INDIR/Trinity-10-cap3-cat.fasta
+OUTFILE1=$OUTDIR/trinity-cap3-blast-all-chromosomes-results.tsv
+OUTFILE2=$OUTDIR/trinity-10-cap3-blast-all-chromosomes-results.tsv
+OUTFILE3=$OUTDIR/trinity-cap3-blast-all-chromosomes-results-H.tsv
+OUTFILE4=$OUTDIR/trinity-10-cap3-blast-all-chromosomes-results-H.tsv
+####OUTFILE3=$OUTDIR/trinity-cap3-blast-itself-results.tsv
+####OUTFILE4=$OUTDIR/trinity-10-cap3-blast-itself-results.tsv
+
+blastn -db $REF1 -query $READS1 -outfmt 6 > $OUTFILE1
+blastn -db $REF1 -query $READS2 -outfmt 6 > $OUTFILE2
+blastn -db $REF1 -query $READS1 -outfmt 7 > $OUTFILE3
+blastn -db $REF1 -query $READS2 -outfmt 7 > $OUTFILE4
+
+2>>$MYLOG
+

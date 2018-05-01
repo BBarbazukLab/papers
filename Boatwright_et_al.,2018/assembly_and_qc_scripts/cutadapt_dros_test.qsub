@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -N Trago
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /scratch/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=10:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load cutadapt
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+INDIR=$PROJ/dros_test_assembly/dros_input
+OUTDIR=$PROJ/dros_test_assembly
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#### Create LOG directory and start log
+LOGS=$OUTDIR/LOGS  	#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/dros_test_cutadapt.log
+
+#### Start Cutadapt Trimmer
+OUT1=$OUTDIR/cutadapt
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+#### RUN cutadapt on READTYPE 1 
+	cutadapt \
+	    --error-rate=0.1 \
+	    --times=1 \
+	    --overlap=5 \
+	    --minimum-length=0 \
+	    --adapter=GATCGGAAGAGCACACGTCT \
+	    --front=TACACGACGCTCTTCCGATC \
+	    --quality-base=33 \
+	    --output=$OUT1/r324_1_cutadapt.fq \
+	    $INDIR/r324_1.fastq \
+	2>>$MYLOG	
+
+#### RUN cutadapt on Pair2 Files
+    cutadapt \
+	--error-rate=0.1 \
+	--times=1 \
+	--overlap=5 \
+	--minimum-length=0 \
+	--adapter=GATCGGAAGAGCGTCGTGTA \
+	--front=AGACGTGTGCTCTTCCGATC \
+	--quality-base=33 \
+	--output=$OUT1/r324_2_cutadapt.fq \
+	$INDIR/r324_2.fastq \
+    2>>$MYLOG

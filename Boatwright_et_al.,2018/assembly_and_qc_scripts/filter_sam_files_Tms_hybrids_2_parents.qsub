@@ -1,0 +1,54 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N filter_sam
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=15:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=160G
+#PBS -q bio
+#PBS -t 4-6
+
+## Tm hybrid (1-3) is cross of Tdu and Tpo
+## Tms hybrid (4-6) is cross of Tdu and Tpr
+
+module load perl 
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+SCRIPTS=/scratch/lfs/mcintyre/trago/scripts
+REF=/scratch/lfs/mcintyre/trago/references
+SAM=/scratch/lfs/mcintyre/trago/trago_output/aln_hybrids_to_consensed
+
+OUTPUT=$PROJ/trago_output/filtered_hybrid_sam_files 
+if [ ! -e $OUTPUT ]; then mkdir $OUTPUT; fi
+
+#### Create LOG directory
+LOGS=$OUTPUT/logs
+if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+
+#### Using SGE Array to pull in species (all caps and not)  from external csv
+    DESIGN_FILE=$PROJ/design_files/trago_hybrids_with_reps.txt
+    DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    SP=${ARRAY[0]}
+    REP=${ARRAY[1]}
+
+#### Filter SAM files aligned to TDU with TDU-tpr bed file 
+    perl $SCRIPTS/sam-filter-by-bed.pl \
+	-b $REF/TDU-tpr_overlaps_WRT_orthologs.bed \
+	-s $SAM/${SP}_${REP}_uniq_2_TDU.sam \
+	>$OUTPUT/${SP}_${REP}_uniq_2_TDU_filter.sam \
+	2> $LOGS/${SP}_${REP}_uniq_2_TDU_filter.log
+    
+#### Filter SAM file aligned to TPR with TPR-tdu bed file
+    perl $SCRIPTS/sam-filter-by-bed.pl \
+        -b $REF/TPR-tdu_overlaps_WRT_orthologs.bed \
+        -s $SAM/${SP}_${REP}_uniq_2_TPR.sam \
+        >$OUTPUT/${SP}_${REP}_uniq_2_TPR_filter.sam \
+        2> $LOGS/${SP}_${REP}_uniq_2_TPR_filter.log
+

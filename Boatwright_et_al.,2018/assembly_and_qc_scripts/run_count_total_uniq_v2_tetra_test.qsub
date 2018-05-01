@@ -1,0 +1,53 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/dups/
+#PBS -l walltime=06:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=6Gb
+
+module load python/2.7.3
+
+## Set Directories
+    PROJ=/scratch/lfs/mcintyre/trago
+    ORIG=$PROJ/trago_data
+    OUTDIR=$PROJ/qc/qc_duplicatesv2/diploid
+    OUTFILES=$OUTDIR/files
+
+    if [ ! -e $OUTFILES ]; then mkdir -p $OUTFILES; fi
+
+    OUT=duplicate_count_summary_`date +"%Y%m%d"`.csv
+
+    DESIGN_FILE=$PROJ/design_files/trago_diploid_design_file.csv
+
+for PBS_ARRAYID in {1..36}
+do
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    SAMPLE=${ARRAY[0]}
+    BARCODE=${ARRAY[1]}
+    LANE=${ARRAY[2]}
+    RUN=${ARRAY[3]}
+    NUM=${ARRAY[4]}
+    NAME=${SAMPLE}_${BARCODE}_${LANE}_${RUN}_00${NUM}
+
+    python /scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py -i $ORIG/${NAME}.fastq -o $TMPDIR/${NAME}.csv -t $OUTFILES/${NAME}_table.txt
+
+done
+
+cd $TMPDIR
+FLAG=0
+for FILE in *.csv;
+do 
+    if [ $FLAG -eq 0 ];
+    then
+        cat $FILE > $OUTDIR/$OUT
+        FLAG=1;
+    fi
+    tail -n 1 $FILE >> $OUTDIR/$OUT
+done

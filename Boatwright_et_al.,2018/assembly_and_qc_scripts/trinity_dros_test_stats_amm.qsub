@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -N dros_stats
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -l nodes=1:ppn=6
+#PBS -l walltime=1:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+
+module load trinity/r20140413
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+INDIR=/scratch/lfs/mcintyre/trago/dros_test_assembly/normalized_trinity
+
+
+DESIGN_FILE=$PROJ/trago_diploid_species_list.csv
+SPECIES=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+### cd to folder with trinity output 
+cd $INDIR
+
+#### RUN trinity stats on dros test assemblies
+
+TrinityStats.pl r324_paired_trinityOutput.Trinity.fasta > Trinity_dros_r324_stats.txt
+TrinityStats.pl r324_paired_with10_trinityOutput.Trinity.fasta > Trinity_dros_r324_with10_stats.txt

@@ -1,0 +1,66 @@
+#!/bin/bash
+#PBS -N Trago
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/outfiles/PBS_LOGS/trinity_10
+#PBS -o Trago-trinity_10_cat.log
+#PBS -j oe
+#PBS -W group_list=barbazuk 
+#PBS -l nodes=1:ppn=3
+#PBS -l walltime=100:00:00
+#PBS -l pmem=20gb
+###PBS -q bio
+#PBS -t 1,2,3%3
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load trinity
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+OUTDIR=$WORK/$PROJ/outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+INDIR=$OUTDIR/trimmomatic_cat_10
+#######INDIR=$WORK/$PROJ/outfiles/trimmomatic_cat
+
+
+#### Because I am using an Array I am pulling LINE:MV:REP from an external CSV with all possible combinations
+
+DESIGN_FILE=$WORK/$PROJ/trago_biorep_list_3.csv
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+SPECIES=${ARRAY[0]}
+#####READTYPE1=${ARRAY[1]}
+READTYPE1="R1"
+READTYPE2="R2"
+
+
+#### Create LOG directory and start log
+LOGS=$OUTDIR/LOGS/trinity_10 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/${SPECIES}_cat_trinity_10.log
+printf "`date` $SPECIES SGE_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+
+#### Start Trinity
+READS1=$INDIR/${SPECIES}_cat_${READTYPE1}_001_trimmomatic_10_paired.fq
+READS2=$INDIR/${SPECIES}_cat_${READTYPE2}_001_trimmomatic_10_paired.fq
+OUT1=$OUTDIR/trinity_10/${SPECIES}
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+
+####printf "$LANE\n" >> $MYLOG
+
+export _JAVA_OPTIONS="-Xmx20g"
+#### RUN trinity on Paired-end Files
+Trinity.pl --seqType fq --JM 10G --left $READS1  --right $READS2 --output $OUT1 --CPU 3 --no_cleanup &>>$MYLOG

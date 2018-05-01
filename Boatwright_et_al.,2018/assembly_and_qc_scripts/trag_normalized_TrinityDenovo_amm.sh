@@ -1,0 +1,127 @@
+##Job settings 
+#PBS -N trin_on_norm 
+#PBS -m abe 
+##PBS -M ammorse@ufl.edu 
+##Job Resources 
+#PBS -l nodes=1:ppn=5
+#PBS -l pmem=32gb 
+#PBS -l walltime=160:00:00
+#PBS -r n
+#PBS -q bigmem
+
+PROJ=/scratch/lfs/mcintyre/trago
+OUT=/scratch/lfs/mcintyre/trago/trago_output/trag_normalized_trinity_SC
+IN=/scratch/lfs/mcintyre/trago/trago_output
+
+module load trinity/r20130225
+unset _JAVA_OPTIONS;
+module load java/1.6.0_31
+export _JAVA_OPTIONS="-Xms1g -Xmx30g"
+
+
+## (1) Tdu normalized trinity
+
+rm -r $OUT/Tdu_dir_denovTrinityOutput
+mkdir $OUT/Tdu_dir_denovTrinityOutput
+
+Trinity.pl 
+	--seqType fq \
+	--left $IN/left_Tdu.txt.normalized_K25_C50_pctSD100.fq \
+	--right $IN/right_Tdu.txt.normalized_K25_C50_pctSD100.fq \
+	--JM 90G \
+	--bflyHeapSpaceInit 1G \
+	--bflyHeapSpaceMax 30G \
+	--CPU 5 \
+	--output $OUT/Tdu_dir_denovTrinityOutput \
+	--full_cleanup \
+	--min_contig_length 200  
+
+
+## (2) Tdu 10 normalized trinity
+
+rm -r $OUT/Tdu_10_dir_denovTrinityOutput
+mkdir $OUT/Tdu_10_dir_denovTrinityOutput
+
+Trinity.pl \
+	--seqType fq \
+        --left $IN/left_Tdu_10.txt.normalized_K25_C50_pctSD100.fq \
+        --right $IN/right_Tdu_10.txt.normalized_K25_C50_pctSD100.fq \
+        --JM 90G \
+        --bflyHeapSpaceInit 1G \
+        --bflyHeapSpaceMax 30G \
+        --CPU 5 \
+        --output $OUT/Tdu_10_dir_denovTrinityOutput \
+        --full_cleanup \
+        --min_contig_length 200
+
+## (3) Tpr normalized trinity
+
+rm -r $OUT/Tpr_dir_denovTrinityOutput
+mkdir $OUT/Tpr_dir_denovTrinityOutput
+
+Trinity.pl \
+	--seqType fq \
+        --left $IN/left_Tpr.txt.normalized_K25_C50_pctSD100.fq \
+        --right $IN/right_Tpr.txt.normalized_K25_C50_pctSD100.fq \
+        --JM 90G \
+        --bflyHeapSpaceInit 1G \
+        --bflyHeapSpaceMax 30G \
+        --CPU 5 \
+        --output $OUT/Tpr_dir_denovTrinityOutput \
+        --full_cleanup \
+        --min_contig_length 200
+
+
+## (4) Tpr 10 normalized trinity
+
+rm -r $OUT/Tpr_10_dir_denovTrinityOutput
+mkdir $OUT/Tpr_10_dir_denovTrinityOutput
+
+Trinity.pl \
+	--seqType fq \
+        --left $IN/left_Tpr_10.txt.normalized_K25_C50_pctSD100.fq \
+        --right $IN/right_Tpr_10.txt.normalized_K25_C50_pctSD100.fq \
+        --JM 90G \
+        --bflyHeapSpaceInit 1G \
+        --bflyHeapSpaceMax 30G \
+        --CPU 5 \
+        --output $OUT/Tpr_10_dir_denovTrinityOutput \
+        --full_cleanup \
+        --min_contig_length 200
+
+## (5) Tpo normalized trinity
+
+rm -r $OUT/Tpo_dir_denovTrinityOutput
+mkdir $OUT/Tpo_dir_denovTrinityOutput
+
+Trinity.pl \
+	--seqType fq \
+        --left $IN/left_Tpo.txt.normalized_K25_C50_pctSD100.fq \
+        --right $IN/right_Tpo.txt.normalized_K25_C50_pctSD100.fq \
+        --JM 90G \
+        --bflyHeapSpaceInit 1G \
+        --bflyHeapSpaceMax 30G \
+        --CPU 5 \
+        --output $OUT/Tpo_dir_denovTrinityOutput \
+        --full_cleanup \
+        --min_contig_length 200
+
+
+## (6) Tpo 10 normalized trinity
+
+rm -r $OUT/Tpo_10_dir_denovTrinityOutput
+mkdir $OUT/Tpo_10_dir_denovTrinityOutput
+
+Trinity.pl \
+	--seqType fq \
+        --left $IN/left_Tpo_10.txt.normalized_K25_C50_pctSD100.fq \
+        --right $IN/right_Tpo_10.txt.normalized_K25_C50_pctSD100.fq \
+        --JM 90G \
+        --bflyHeapSpaceInit 1G \
+        --bflyHeapSpaceMax 30G \
+        --CPU 5 \
+        --output $OUT/Tpo_10_dir_denovTrinityOutput \
+        --full_cleanup \
+        --min_contig_length 200
+
+

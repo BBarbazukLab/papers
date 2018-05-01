@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -N TragoFqFa
+#PBS -q mcintyre
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/fastq2fasta
+#PBS -l walltime=8:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=6gb
+#PBS -t 2-54   
+
+
+module load python 
+
+    PROJ=/scratch/lfs/mcintyre/trago
+    ORIG=$PROJ/original_data
+    OUTDIR=$PROJ/qc/fasta_reads
+    
+    if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+    DESIGN_FILE=$PROJ/design_files/list_fq_files_diploids.txt
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+    
+    NAME=`basename "$DESIGN" .fastq`
+
+    python /scratch/lfs/mcintyre/python.git/fastq2fasta.py -i $ORIG/${NAME}.fastq -o $OUTDIR/$NAME.fa

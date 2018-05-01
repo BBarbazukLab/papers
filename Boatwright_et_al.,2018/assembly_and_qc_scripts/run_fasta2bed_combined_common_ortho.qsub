@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -N fa2bed
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=8:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=6gb
+
+module load python
+
+PROJ=/scratch/lfs/mcintyre/trago
+ORIG=$PROJ/references
+OUTDIR=$PROJ/references
+
+python $PROJ/scripts/fasta2bed.py -f $ORIG/combined_common_ortho.fasta -o $ORIG/combined_common_ortho.bed -g $ORIG/logs/combined_common_ortho

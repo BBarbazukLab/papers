@@ -1,0 +1,70 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m ae
+#PBS -r n
+#PBS -N mpile_filt_Tms
+#PBS -l walltime=144:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=80gb
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -q bio
+#PBS -t 4-6
+
+### 2 hybrids and 3 reps per species = 6
+     ## 1-3 are Tm and 4-6 are Tms
+     ## Tm = TDU x TPO
+     ## Tms = TDU x TPR
+
+
+## mpileups for Tms reps to parents
+
+module load samtools/1.2
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+
+#### Because I am using an PBS Array I am pulling LINE from an external txt file
+DESIGN_FILE=$PROJ/design_files/trago_hybrids_with_reps.txt
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+SP=${ARRAY[0]}
+REP=${ARRAY[1]}
+
+for i in TDU TPR
+  do  
+    REF=$PROJ/references/${i}_consensed_contigs_500-15k.fasta
+
+    SAM=$PROJ/trago_output/filtered_hybrid_sam_files/${SP}_${REP}_uniq_2_${i}_filter_commomID.sam
+
+#### Create OUTPUT directory if needed.
+    OUTPUT=$PROJ/trago_output/filtered_hybrid_sam_files/mpileups
+    if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+#### Create LOG directory and start log
+    LOGS=$OUTPUT/logs 
+    if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+    MYLOG=$LOGS/${SP}_${REP}_mpileup.log
+
+#### Convert SAM to BAM
+    BAM=$PROJ/trago_output/filtered_hybrid_sam_files/mpileups/${SP}_${REP}_uniq_2_${i}_filter_commomID
+
+    echo `date`": Starting SAM to BAM conversion" > $MYLOG
+    samtools view -ut $REF.fai -o $BAM.bam $SAM 2>>$MYLOG 
+    samtools sort -m 10000000000 $BAM.bam $BAM.sorted 2>>$MYLOG
+    samtools index $BAM.sorted.bam  >>$MYLOG
+    echo `date`": Finished SAM to BAM conversion" >> $MYLOG
+
+#### Make mpileup
+    PILEUP=$OUTPUT/${SP}_${REP}_uniq_2_${i}_filter_commomID.mpileup
+
+    printf "`date` $SP PBS_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" >> $MYLOG
+
+    echo `date`": Generating pileup" >> $MYLOG
+
+    samtools mpileup -d 10000000000 -f $REF $BAM.sorted.bam  > $PILEUP 2>> $MYLOG
+
+    echo `date`": Finished" >> $MYLOG
+
+  done

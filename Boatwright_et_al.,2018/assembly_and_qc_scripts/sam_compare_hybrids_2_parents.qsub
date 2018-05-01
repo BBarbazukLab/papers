@@ -1,0 +1,75 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N sam_Tm
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=15:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=160G
+#PBS -q bio
+#PBS -t 1
+
+## Tm hybrid (1-3) is cross of Tdu and Tpo
+## Tms hybrid (4-6) is cross of Tdu and Tpr
+
+module load perl 
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+SCRIPTS=/scratch/lfs/mcintyre/trago/scripts
+
+OUTPUT=$PROJ/trago_output/ase_output_ortho_uniq 
+if [ ! -e $OUTPUT ]; then mkdir $OUTPUT; fi
+
+#### Create LOG directory
+LOGS=$OUTPUT/logs
+if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+
+#### Using SGE Array to pull in species (all caps and not)  from external csv
+    DESIGN_FILE=$PROJ/design_files/trago_hybrids_with_reps.txt
+    DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    SP=${ARRAY[0]}
+    REP=${ARRAY[1]}
+
+
+### Concatenate reads for use in sam-compare
+cat ${PROJ}/original_data/trago-tetraploids/Sample_${SP}${REP}/${SP}${REP}_*.fastq > $TMPDIR/${SP}_${REP}.fastq
+
+    ## Doing Tms so select TDU and TPR alignments for comparing
+    SAM1=${PROJ}/trago_output/aln_hybrids_to_consensed/Tm_${REP}_uniq_2_TDU.sam 
+    SAM2=${PROJ}/trago_output/aln_hybrids_to_consensed/Tm_${REP}_uniq_2_TPR.sam 
+
+if [ ${SP} == Tm ]
+then
+    # Run SAM Compare
+    perl $SCRIPTS/sam-compare-custom_readID_w_space.pl \
+        -l 100 \
+        -f $PROJ/references/TDU_consensed_contigs_500-15k.tsv \
+        -r $PROJ/references/TDU_consensed_contigs_500-15k.fasta \
+        -q $TMPDIR/Tm_${REP}.fastq \
+        -A $SAM1 \
+        -B $SAM2 \
+        >$OUTPUT/ase_counts_Tm_${REP}_2_Tdu_Tpo.csv \
+        2> $LOGS/ase_counts_Tm_${REP}_2_Tdu_Tpo.log
+else
+    if [ ${SP} == Tms ]
+    then 
+        # Run SAM Compare
+        perl $SCRIPTS/sam-compare-custom_readID_w_space.pl \
+            -l 100 \
+            -f $PROJ/references/TDU_consensed_contigs_500-15k.tsv \
+            -r $PROJ/references/TDU_consensed_contigs_500-15k.fasta \
+            -q $TMPDIR/Tm_${REP}.fastq \
+            -A $SAM1 \
+            -B $SAM2 \
+            >$OUTPUT/ase_counts_Tm_${REP}_2_Tdu_Tpr.csv \
+            2> $LOGS/ase_counts_Tm_${REP}_2_Tdu_Tpr.log
+
+    fi
+fi
+

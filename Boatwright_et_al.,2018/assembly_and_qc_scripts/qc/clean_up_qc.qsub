@@ -1,0 +1,57 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N qc_cleanup
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -l walltime=2:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=4gb
+#PBS -t 1
+
+##### Script to clean up QC folder by removing unneeded intermediate files
+##### The following files will be kept:
+## FASTQC: PDFs, pass-fail summary CSV, list of Kmers and overrepresented sequences per sample
+## QC: adapter, homopolymer and duplicates summaries and plots
+## ERCC: concentration plots, merged coverage CSV and SAS datasets
+## FASTQ Split Dups PE (this is in the project folder)
+
+##### The following files will be deleted:
+## Gunzipped FASTQ files
+## FASTQC: HTML files
+## QC: All by-sample files, FASTA files, other intermediate files
+## ERCC: alignments, mpileups, coverage counts per sample
+
+## Set directories
+PROJ=/scratch/lfs/mcintyre/trago
+QC=/scratch/lfs/mcintyre/trago/qc_test
+FASTQ=/scratch/lfs/mcintyre/trago/original_data/trago-tetraploids
+
+
+## Remove GUnzipped FASTQ files
+rm -r ${FASTQ}
+
+## Remove FASTQC intermediate files
+rm -r $QC/fastqc/fastqc_files
+
+## Remove QC intermediate files
+
+# Duplicate counts
+rm -r $QC/fastq_split_dups
+rm -r $QC/duplicate_counts
+
+# Homopolymers
+rm -r $QC/homopolymer_files
+rm -r $QC/homopolymer_logs
+
+# Adapters
+rm -r $QC/fasta_reads
+rm -r $QC/qc_adapters
+
+## Remove ERCC intermediate files
+rm -r $QC/ercc/aln_ERCC_all_se
+rm -r $QC/ercc/ercc_se_mpileups
+rm -r $QC/ercc/bam_files_ercc
+rm -r $QC/ercc/coverage_counts_ercc
+rm -r $QC/sas_temp

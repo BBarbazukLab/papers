@@ -1,0 +1,57 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N parse_aln
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=01:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=900mb
+
+module load python/2.7.3 
+
+PROJ=/scratch/lfs/mcintyre/trago
+OUTPUT=$PROJ/trago_output/aln_to_orthos_final_uniq_pipe
+LOGS=$OUTPUT/aln_logs
+SCRIPTS=$PROJ/scripts
+
+for I in {1..6}
+do
+    DESIGN_FILE=$PROJ/design_files/trago_hybrids_with_reps.txt
+    DESIGN=$(sed -n "${I}p" $DESIGN_FILE)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    SP=${ARRAY[0]}
+    REP=${ARRAY[1]}
+    
+    if [ -s $LOGS/${SP}_${REP}_2_Tdu_bowtie.log ]
+    then
+        python ${SCRIPTS}/logParser.py \
+            -bowtie $LOGS/${SP}_${REP}_2_Tdu_bowtie.log \
+            -last $LOGS/${SP}_${REP}_2_Tdu_LAST.log \
+            -treatment $SP $REP \
+            -o $OUTPUT/aln_summary_${SP}_${REP}_Tdu_`date +%Y%m%d`.csv
+    fi
+
+    if [ -s $LOGS/${SP}_${REP}_2_Tpo_bowtie.log ]
+    then
+        python ${SCRIPTS}/logParser.py \
+            -bowtie $LOGS/${SP}_${REP}_2_Tpo_bowtie.log \
+            -last $LOGS/${SP}_${REP}_2_Tpo_LAST.log \
+            -treatment $SP $REP \
+            -o $OUTPUT/aln_summary_${SP}_${REP}_Tpo_`date +%Y%m%d`.csv
+    fi
+
+    if [ -s $LOGS/${SP}_${REP}_2_Tpr_bowtie.log ]
+    then
+        python ${SCRIPTS}/logParser.py \
+            -bowtie $LOGS/${SP}_${REP}_2_Tpr_bowtie.log \
+            -last $LOGS/${SP}_${REP}_to_Tpr_LAST.log \
+            -treatment $SP $REP \
+            -o $OUTPUT/aln_summary_${SP}_${REP}_Tpr_`date +%Y%m%d`.csv
+    fi
+
+done

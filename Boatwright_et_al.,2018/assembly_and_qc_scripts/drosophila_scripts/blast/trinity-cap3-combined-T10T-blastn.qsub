@@ -1,0 +1,52 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast
+#PBS -o Drosophila-cap3-combined-T10T-zero-hit-plus-F150-blast-all-chromosomes.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=10:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#####PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/cap3-combined
+
+OUTDIR=$INDIR/blast
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/ 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila-cap3-combined-T10T-zero-hit-plus-F150-blast-all-chromosomes-LOG.log
+printf "`date` \n\n" > $MYLOG
+
+
+REF=$WORK/$PROJ/dros_outfiles/references/dmel-all-chromosome-r5.30_BLAST
+###REF=$WORK/$PROJ/dros_outfiles/references/dmel-all-transcript-r5.30_BLAST
+###REF3=$INDIR/Trinity-cap3_BLAST
+###READS1=$INDIR/cap3-combined-T10T.fasta
+READS=$INDIR/cap3-combined-T10T-zero-hit-plus-F150-out.fasta
+####OUTFILE1=$OUTDIR/cap3-combined-T10T-blast-all-transcripts-results.tsv
+####OUTFILE2=$OUTDIR/cap3-combined-T10T-blast-all-transcripts-results-H.tsv
+OUTFILE1=$OUTDIR/cap3-combined-T10T-zero-hit-plus-F150-blast-all-chromosomes-results.tsv
+OUTFILE2=$OUTDIR/cap3-combined-T10T-zero-hit-plus-F150-blast-all-chromosomes-results.tsv-H.tsv
+
+blastn -db $REF -query $READS -outfmt 6 > $OUTFILE1
+blastn -db $REF -query $READS -outfmt 7 > $OUTFILE2
+
+2>>$MYLOG

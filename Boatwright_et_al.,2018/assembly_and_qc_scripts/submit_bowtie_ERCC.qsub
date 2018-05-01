@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -N TragoERCC
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/ercc_map
+#PBS -l walltime=11:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=8gb
+
+
+#### Set Directories
+PROJ=/sandbox/ammorse/dandelion
+WORK=$PROJ/bowtie_output
+DATAIN=$PROJ/data_split_by_barcode
+REF=/sandbox/ammorse/references
+
+
+#### I am using an SGE Array (pulls out each name from the file and calls it 'design')
+DESIGN_FILE=$DATAIN/file_list.txt
+DESIGN=$(cat $DESIGN_FILE | head -n $SGE_TASK_ID | tail -n 1)  #steps through file_list.txt by row
+OUTNAME=`basename $DESIGN .txt`
+
+echo "$OUTNAME, aligned against old_ERCC controls"
+
+#note that bowtie sam file is piped to bit of perl script that removes unaligned reads from sam alignment
+
+bowtie --chunkmbs 1040 --sam -n 2 -e 70 -l 29 -m 1 --best --strata --tryhard --un $WORK/unaln_ERCC_$OUTNAME.fq --max $WORK/ambig_ERCC_$OUTNAME.fq $REF/ERCC $DATAIN/$DESIGN | perl -ne 'if (/^@/) {next} @s = split; if ($s[1] != 4) {print}' >$WORK/aln_ERCC_$OUTNAME.sam
+
+
+

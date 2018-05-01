@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/aln_2_lucas_consensed_contigs
+#PBS -l walltime=24:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=20gb
+#PBS -q bio
+
+module load bwa/0.7.9a
+
+PROJ=/scratch/lfs/mcintyre/trago
+
+## Build the BWA indices only once. -p is the prefix for the output database, -a is the indexing algorithm ('bwtsw' is for ref>2G, 'is' for ref<2G).
+    bwa index -p TPO_consensed_contigs_500-15k_BWA -a is $PROJ/references/TPO_consensed_contigs_500-15k.fasta
+    bwa index -p TPR_consensed_contigs_500-15k_BWA -a is $PROJ/references/TPR_consensed_contigs_500-15k.fasta
+    bwa index -p TDU_consensed_contigs_500-15k_BWA -a is $PROJ/references/TDU_consensed_contigs_500-15k.fasta
+

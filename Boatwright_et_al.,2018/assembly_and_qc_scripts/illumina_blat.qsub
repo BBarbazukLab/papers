@@ -1,0 +1,69 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -N Blat
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/staph_DNA/scripts/PBS_LOGS/
+#PBS -l walltime=24:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=8gb
+
+
+module load blat/20140318
+module load python/2.7.3
+
+## Set Directories
+    PROJ=/scratch/lfs/mcintyre/staph_DNA
+    ORIG=/scratch/lfs/mcintyre/staph_DNA/qc/fastq_2_fasta
+
+    OUTDIR=$PROJ/qc/qc_adapters
+    if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+    OUTFILES=$OUTDIR/files
+    if [ ! -e $OUTFILES ]; then mkdir -p $OUTFILES; fi
+
+    LOGS=$OUTDIR/logs 
+    if [ ! -e $LOGS ]; then mkdir -p $LOGS; fi
+
+    PSL=$OUTDIR/psl
+    if [ ! -e $PSL ]; then mkdir -p $PSL; fi
+
+DESIGN_FILE=$PROJ/design_files/design_v4.csv
+for PBS_ARRAYID in {1..100}
+do
+    DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+    READPAIR=${ARRAY[3]}
+    RUNORDER=${ARRAY[4]}
+    STRAIN=${ARRAY[5]}
+
+## Initialize Log
+    MYLOG=$LOGS/${STRAIN}_${READPAIR}_adapter.log
+    printf "`date` $STRAIN ARRAY_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+## Set Reference
+    REF=/scratch/lfs/mcintyre/references/illumina_adapters/illumina_adapter_list.fasta
+
+echo "file,total_num_reads,num_reads_w_adapter,per_adapter" > $OUTFILES/${STRAIN}_${READPAIR}.csv
+## Start BLAT
+    for FILE in $ORIG/${STRAIN}_R${READPAIR}_distinct.fa
+    do
+        if [ -s $FILE ]
+        then
+            STRAIN2=`basename "$FILE" .fa`
+            printf "`date` Starting BLAT $FILE\n" >> $MYLOG
+            blat $REF $FILE  $PSL/$STRAIN2.psl 2>>$MYLOG
+            printf "`date` Finished BLAT $FILE\n" >> $MYLOG
+
+            TOTAL=`grep ">" $FILE | wc -l`
+            COUNT=`cut -f 10 $PSL/${STRAIN2}.psl | sort | uniq | wc -l`
+            PER=`echo "scale=4; $COUNT / $TOTAL * 100" | bc`
+            echo "$STRAIN2,$TOTAL,$COUNT,$PER" >> $OUTFILES/${STRAIN}_${READPAIR}.csv
+        fi
+    done
+
+printf "`date` Script complete" >> $MYLOG
+
+done

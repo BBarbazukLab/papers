@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -M s.lawrence@ufl.edu
+#PBS -m n
+#PBS -N fa2bed
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=8:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=6gb
+#PBS -t 2-9
+
+module load python
+
+PROJ=/scratch/lfs/mcintyre/trago
+ORIG=$PROJ/references
+OUTDIR=$PROJ/references
+
+DESIGN_FILE=$PROJ/design_files/trago_spec_only_with_capitals_reps.txt
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+SP_CAP=${ARRAY[0]}
+SP=${ARRAY[1]}
+REP=${ARRAY[2]}
+
+python $PROJ/scripts/fasta2bed.py -f $ORIG/${SP}All_greater_than_500_cat.fasta -o $ORIG/${SP}_All.bed -g $ORIG/logs/${SP}
+
+

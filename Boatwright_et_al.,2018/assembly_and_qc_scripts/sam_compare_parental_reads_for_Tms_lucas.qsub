@@ -1,0 +1,75 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N sam_Tms2
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=15:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=160G
+#PBS -q bio
+
+
+
+module load python/2.7.3
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+SCRIPTS=/scratch/lfs/mcintyre/python.git
+
+OUTPUT=$PROJ/trago_output/ase_counts/test
+if [ ! -e $OUTPUT ]; then mkdir $OUTPUT; fi
+
+#### Create LOG directory
+LOGS=$OUTPUT/logs
+if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+
+# Doing TDU for Tms so TDU and TPR alignments for comparing
+for i in 1 2 3
+do 
+
+    ### Concatenate reads for use in sam-compare
+    cat ${PROJ}/original_data/Tdu${i}_*.fastq | sed 's/ /_/g' > $TMPDIR/Tdu${i}.fastq
+
+    ## Doing TDU for Tms so TDU and TPR alignments for comparing
+    SAMA=$PROJ/trago_output/filtered_parent_sam_files/Tdu_${i}_unq_2_TDU_4_Tms_commonID.sam
+    SAMB=$PROJ/trago_output/filtered_parent_sam_files/Tdu_${i}_unq_2_TPR_4_Tms_commonID.sam
+
+    # Run SAM Compare
+    python $SCRIPTS/sam_compare.py \
+        -d \
+	-l 100 \
+        -f $PROJ/references/TDU_tpr_bed_for_sam_compare.bed \
+        -q $TMPDIR/Tdu${i}.fastq \
+        -A $SAMA \
+        -B $SAMB \
+        -c $OUTPUT/ase_counts_Tdu${i}_2_Tdu_Tpr.csv \
+        -t $OUTPUT/ase_totals_Tdu${i}_2_Tdu_Tpr.csv \
+        -g $LOGS/ase_counts_Tdu${i}_2_Tdu_Tpr.log
+done
+
+# Doing TPR for Tms so TDU and TPR alignments for comparing
+for i in 1 2 3
+do 
+
+    ### Concatenate reads for use in sam-compare
+    cat ${PROJ}/original_data/Tpr${i}_*.fastq | sed 's/ /_/g' > $TMPDIR/Tpr${i}.fastq
+
+    ## Doing TPR for Tms so TDU and TPR alignments for comparing
+    SAMA=$PROJ/trago_output/filtered_parent_sam_files/Tpr_${i}_unq_2_TDU_4_Tms_commonID.sam 
+    SAMB=$PROJ/trago_output/filtered_parent_sam_files/Tpr_${i}_unq_2_TPR_4_Tms_commonID.sam   
+
+    # Run SAM Compare
+    python $SCRIPTS/sam_compare.py \
+        -d \
+	-l 100 \
+        -f $PROJ/references/TPR_tdu_bed_for_sam_compare.bed \
+        -q $TMPDIR/Tpr${i}.fastq \
+        -A $SAMA \
+        -B $SAMB \
+        -c $OUTPUT/ase_counts_Tpr${i}_2_Tdu_Tpr.csv \
+        -t $OUTPUT/ase_totals_Tpr${i}_2_Tdu_Tpr.csv \
+        -g $LOGS/ase_counts_Tpr${i}_2_Tdu_Tpr.log
+done
+

@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -M polvadore@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS-o /bio/mcintyre/trago/scripts/fastqc/PBS_LOGS/
+#PBS -l walltime=10:00:00
+#PBS -l nodes=1:ppn=4
+#PBS -l pmem=5gb
+#PBS -t 1-54
+#54 fastq files
+
+module load bowtie/0.12.8
+
+#### Set Directories
+PROJ=/bio/mcintyre/trago
+DATAIN=$PROJ/outfiles/cutadapt
+REF=/bio/mcintyre/references/ERCC_Ambion
+WORK=$PROJ/ercc_alignments/diploid_trimmed
+
+#### I am using an SGE Array (pulls out each name from the file and calls it 'design')
+DESIGN_FILE=$PROJ/outfiles/fastqc/diploids/design_files/list_trago_dip_trim_fq.txt
+DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)  #steps through list_trago_dip_untrim_fq.txt by row
+
+echo "$DESIGN, file I'm on"
+
+ID=$(basename "$DESIGN" .fq)
+
+echo "$ID, aligned against ercc controls"
+
+#note that bowtie sam file is piped to bit of perl script that removes unaligned reads from sam alignment
+
+## Start bowtie 
+bowtie --chunkmbs 1040 --sam -n 2 -e 70 -l 29 -m 1 --best --strata --tryhard --un $WORK/unaln_ERCC_$ID.fq --max $WORK/ambig_ERCC_$ID.fq $REF/ERCC92 $DATAIN/$DESIGN | perl -ne 'if (/^@/) {next} @s = split; if ($s[1] != 4) {print}' >$WORK/aln_ERCC_$ID.sam
+
+
+

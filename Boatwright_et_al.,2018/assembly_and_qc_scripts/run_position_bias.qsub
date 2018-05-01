@@ -1,0 +1,35 @@
+#!/bin/bash
+#PBS -M fnew@ufl.edu
+#PBS -m n
+#PBS -N TragoPosBias
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/posBias
+#PBS -l walltime=5:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=8gb
+#PBS -t 6-54
+
+module load python 
+
+#Set directories
+PROJ=/scratch/lfs/mcintyre/trago
+ORIG=$PROJ/original_data
+OUTDIR=$PROJ/qc/posBias_files
+OUTLOG=$PROJ/qc/posBias_logs
+
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+if [ ! -e $OUTLOG ]; then mkdir -p $OUTLOG; fi
+
+
+#Pull info from design files
+
+DESIGN_FILE=$PROJ/design_files/trago_dup_design.txt
+INPUT=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+NAME=`basename $INPUT .fastq`
+    
+LOG=$OUTLOG/${NAME}.log
+     
+python $PROJ/scripts/position_bias_v3.py  -i $ORIG/${NAME}.fastq -o $OUTDIR/$NAME.csv -g $LOG

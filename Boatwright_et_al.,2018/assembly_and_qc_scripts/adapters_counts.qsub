@@ -1,0 +1,36 @@
+#/bin/bash
+#PBS -M fnew@ufl.edu
+#PBS -m n
+#PBS -N tragoAdapters
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/adapter_counts
+#PBS -l walltime=12:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=10Gb
+#PBS -t 1-54
+
+module load python/2.7.3
+
+## Set Directories
+    PROJ=/scratch/lfs/mcintyre/trago
+    FQ=$PROJ/original_data
+    PSL=$PROJ/qc/qc_adapters/psl
+    OUT=$PROJ/qc/insert_counts/adapters
+
+    if [ ! -e $OUT ]; then mkdir -p $OUT; fi
+
+# Pull info from design file
+    DESIGN_FILE=$PROJ/design_files/list_fq_files_diploids.txt
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+
+    NAME=`basename "$DESIGN" .fastq`
+
+
+    tail -n +6 $PSL/${NAME}.psl | cut -f 10 | sort | uniq > $OUT/${NAME}_adapters.txt
+
+    sed -n "1~4p" $FQ/${NAME}.fastq | cut -f1 -d" " | sed 's/^@//g' > $OUT/${NAME}_allreads.txt
+
+

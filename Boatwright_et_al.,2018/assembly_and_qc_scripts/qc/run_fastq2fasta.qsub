@@ -1,0 +1,41 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N fastq2fasta
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -l walltime=2:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=12gb
+#PBS -t 2-37
+
+
+# Load modules
+
+module load python/2.7.3
+
+#Set directories
+PROJ=/scratch/lfs/mcintyre/trago
+ORIG=/scratch/lfs/mcintyre/trago/original_data/trago-tetraploids
+QC=/scratch/lfs/mcintyre/trago/qc_test
+MCPYTHON=/scratch/lfs/mcintyre/python.git
+
+OUTPUT=$QC/fasta_reads
+if [ ! -e $OUTPUT ]; then mkdir -p $OUTPUT; fi
+
+
+## Design file (for paired end reads)
+     DESIGN_FILE=$PROJ/design_files/qc_design_file.csv
+
+     DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+     IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+     READ=${ARRAY[0]}
+     NAME=${ARRAY[1]}
+
+
+
+
+# run script 
+        python $MCPYTHON/fastq2fasta.py -i ${ORIG}/${READ} -o $OUTPUT/${READ}.fa

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tdu1_CGATGT_L001_R1_001.csv'
+Traceback (most recent call last):
+  File "/scratch/lfs/mcintyre/python.git/count_total_uniq_fq_v2.py", line 28, in <module>
+    with open(args.out,'wb') as dataout:
+IOError: [Errno 13] Permission denied: '/Tdu1_CGATGT_L001_R2_001.csv'

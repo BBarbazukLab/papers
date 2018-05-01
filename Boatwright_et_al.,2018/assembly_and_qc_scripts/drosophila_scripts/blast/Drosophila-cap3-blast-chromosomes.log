@@ -1,0 +1,11 @@
+
+
+Building a new DB, current time: 04/06/2016 12:24:38
+New DB name:   /bio/mcintyre/references/dmel_557dmel-all-chromosome-r5.57_BLAST
+New DB title:  /bio/mcintyre/references/dmel_557dmel-all-chromosome-r5.57.fasta
+Sequence type: Nucleotide
+Keep Linkouts: T
+Keep MBits: T
+Maximum file size: 1000000000B
+BLAST options error: File /bio/mcintyre/references/dmel_557dmel-all-chromosome-r5.57.fasta does not exist
+Command line argument error: Argument "query". File is not accessible:  `/bio/mcintyre/trago/dros_test_assembly/cap3/r324_dros_combined_trinity_and_cap3.fa'

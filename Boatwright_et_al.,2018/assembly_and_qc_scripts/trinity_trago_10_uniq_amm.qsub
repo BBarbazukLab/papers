@@ -1,0 +1,59 @@
+#!/bin/bash
+#PBS -N Trin_10
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -l nodes=1:ppn=10
+#PBS -l walltime=180:00:00
+#PBS -l pmem=20gb
+#PBS -q bigmem
+#PBS -t 1-3
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+
+module load trinity/r20130225
+unset _JAVA_OPTIONS;
+module load java/1.6.0_31
+export _JAVA_OPTIONS="-Xms1g -Xmx30g"
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+INDIR=$PROJ/trago_output
+OUTDIR=$WORK/$PROJ/trago_output/trinity
+
+#### Because I am using an Array I am pulling SPECIES from an external file 
+
+DESIGN_FILE=$PROJ/trago_diploid_species_list.csv
+SPECIES=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+LOGS=$OUTDIR/logs_10
+MYLOG=$LOGS/${SPECIES}_cat_trinity.log
+printf "`date` $SPECIES SGE_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+#### Start Trinity
+READS1=$INDIR/${SPECIES}_R1_10_table_uniq.txt.fa
+READS2=$INDIR/${SPECIES}_R2_10_table_uniq.txt.fa
+OUTPUT=$OUTDIR/trinity_10/${SPECIES}
+if [ ! -e $OUT1 ]
+then
+    mkdir -p $OUT1
+fi
+
+####printf "$LANE\n" >> $MYLOG
+
+#### RUN trinity on Paired-end Files
+Trinity.pl \
+	--seqType fa \
+	--JM 120G \
+	--left $READS1 \
+	--right $READS2 \
+	--bflyHeapSpaceInit 10G \
+	--bflyHeapSpaceMax 60G \
+	--output $OUTPUT \
+	--full_cleanup \
+	--CPU 10 \
+	--min_contig_length 200  \
+	&>>$MYLOG

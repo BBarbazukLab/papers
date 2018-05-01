@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N bed2tsv
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=8:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=6gb
+#PBS -t 1,4,7
+
+module load python
+
+PROJ=/scratch/lfs/mcintyre/trago
+REF=$PROJ/references
+
+DESIGN_FILE=$PROJ/design_files/trago_spec_only_with_capitals_reps.txt
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+SP_CAP=${ARRAY[0]}
+SP=${ARRAY[1]}
+REP=${ARRAY[2]}
+
+python $PROJ/scripts/fix_tsv_files_v4.py -i $REF/${SP_CAP}_consensed_contigs_500-15k.bed -o $REF/${SP_CAP}_consensed_contigs_500-15k.tsv

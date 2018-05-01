@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N underbar_p
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=15:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=160G
+#PBS -q bio
+#PBS -t 1-54 
+
+module load python
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+OUTPUT=$PROJ/original_data_w_underbar
+
+DESIGN_FILE=$PROJ/original_data/list_2_do.txt
+FILE=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+
+cd $PROJ/original_data
+
+python $PROJ/scripts/fix_fastq_files_v2.py -i $FILE -o $OUTPUT/$FILE 

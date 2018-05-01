@@ -1,0 +1,47 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/cap3
+#PBS -o Drosophila-cap3.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=10:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#PBS -t 1,2%1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load cap3
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/cap3
+
+## Because I am using an Array I am pulling LINE:MV:REP from an external CSV with all possible combinations
+
+DESIGN_FILE=$WORK/$PROJ/dros_outfiles/dros_cap3_list.csv
+DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+IFS=',' read -ra ARRAY <<< "$DESIGN"
+INFILEID=${ARRAY[0]}
+
+#### Create LOG directory and start log
+LOGS=$WORK/$PROJ/dros_outfiles/LOGS/cap3 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/${INFILEID}-cap3.log
+printf "`date` $INFILEID SGE_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > $MYLOG
+
+#### Start cap3
+READS=$INDIR/${INFILEID}.fasta
+OUTFILE=$INDIR/${INFILEID}-cap3.out
+
+#### RUN cap3
+cap3   $READS  >  $OUTFILE &>>$MYLOG

@@ -1,0 +1,10 @@
+files	group	description
+both_counts_Tdu_1_2_Tdu_Tpr.csv	Tdu	Tdu_1
+both_counts_Tdu_2_2_Tdu_Tpr.csv	Tdu	Tdu_2
+both_counts_Tdu_3_2_Tdu_Tpr.csv	Tdu	Tdu_3
+both_counts_Tpr_1_2_Tdu_Tpr.csv	Tpr	Tpr_1
+both_counts_Tpr_2_2_Tdu_Tpr.csv	Tpr	Tpr_2
+both_counts_Tpr_3_2_Tdu_Tpr.csv	Tpr	Tpr_3
+both_counts_Tms_1_2_tdu_tpr.csv	Tms	Tms_1
+both_counts_Tms_2_2_tdu_tpr.csv	Tms	Tms_2
+both_counts_Tms_3_2_tdu_tpr.csv	Tms	Tms_3

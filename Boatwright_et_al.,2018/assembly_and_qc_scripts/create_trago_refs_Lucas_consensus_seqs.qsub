@@ -1,0 +1,47 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio
+#PBS -l walltime=05:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=2gb
+
+module load bowtie
+module load samtools
+module load last/247
+
+## Set directories and variables
+PROJ=/scratch/lfs/mcintyre/trago
+REF=/scratch/lfs/mcintyre/trago/references
+
+
+#### (1) Build indexes from the consensus sequences TDU-TPO
+
+echo `date`": building bowtie index for TDU-TPO"
+bowtie-build ${REF}/TDU-TPO_consensus_sequences.fasta ${REF}/TDU-TPO_consensus_sequences &>${REF}/TDU-TPO_consensus_sequences_bt1
+
+echo `date`": building samtools index for TDU-TPO"
+samtools faidx ${REF}/TDU-TPO_consensus_sequences.fasta
+
+echo `date`": building LAST db for TDU-TPO"
+lastdb ${REF}/TDU-TPO_consensus_sequences_last ${REF}/TDU-TPO_consensus_sequences.fasta
+
+echo `date`": processing TDU-TPO complete"
+
+
+
+#### (2) Build indexes from the consensus sequences TDU-TPR
+
+
+echo `date`": building bowtie index for TDU-TPR"
+bowtie-build ${REF}/TDU-TPR_consensus_sequences.fasta ${REF}/TDU-TPR_consensus_sequences &>${REF}/TDU-TPR_consensus_sequences_bt1
+
+echo `date`": building samtools index for TDU-TPR"
+samtools faidx ${REF}/TDU-TPR_consensus_sequences.fasta
+
+echo `date`": building LAST db for TDU-TPR"
+lastdb ${REF}/TDU-TPR_consensus_sequences_last $REF/TDU-TPR_consensus_sequences.fasta
+
+echo `date`": processing TDU-TPR complete"

@@ -1,0 +1,66 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N illumina_blat
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS
+#PBS -l walltime=6:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=8gb
+#PBS -t 2-37
+
+
+# Load modules
+
+module load blat
+
+#Set directories
+PROJ=/scratch/lfs/mcintyre/trago
+QC=/scratch/lfs/mcintyre/trago/qc_test
+ORIG=${QC}/fasta_reads
+
+OUTDIR=$QC/qc_adapters
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+OUTFILES=$OUTDIR/files
+if [ ! -e $OUTFILES ]; then mkdir -p $OUTFILES; fi
+OUTLOGS=$OUTDIR/logs
+if [ ! -e $OUTLOGS ]; then mkdir -p $OUTLOGS; fi
+
+## Design file (for paired end reads)
+     DESIGN_FILE=$PROJ/design_files/qc_design_file.csv
+
+     DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+     IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+     READ=${ARRAY[0]}
+     NAME=${ARRAY[1]}
+
+
+
+
+## Initialize Log
+    MYLOG=$OUTLOGS/${NAME}_adapter.log
+    printf "`date` $NAME ARRAY_ID:$PBS_ARRAYID HOSTNAME:$HOSTNAME \n\n" > \$MYLOG
+
+## Set Reference
+    REF=/scratch/lfs/mcintyre/references/illumina_adapters/illumina_adapter_list.fasta
+    echo "file,total_num_reads,num_reads_w_adapter,per_adapter" > $OUTFILES/${READ}.csv
+## Start BLAT
+   cd $ORIG
+   FILE=${READ}.fa
+   if [ -s $FILE ]
+  then
+      SAMPLE=`basename $FILE .fa`
+      printf "`date` Starting BLAT $FILE\n" >> $MYLOG
+      blat $REF $FILE  $TMPDIR/${READ}.psl 2>> $MYLOG
+      printf "`date` Finished BLAT $FILE\n" >> $MYLOG
+      TOTAL=`grep ">" $FILE | wc -l`
+      COUNT=`cut -f 10 $TMPDIR/${READ}.psl | sort | uniq | wc -l`
+      PER=`echo "scale=4; $COUNT / $TOTAL * 100" | bc`
+      echo "$SAMPLE,$TOTAL,$COUNT,$PER" >> $OUTFILES/${READ}.csv
+  else
+      echo "`date` File was empty." >> $MYLOG
+  fi
+
+printf "`date` Script complete" >> $MYLOG

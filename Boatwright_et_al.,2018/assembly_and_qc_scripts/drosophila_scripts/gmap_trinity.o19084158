@@ -1,0 +1,143 @@
+GMAP version 2014-12-22 called with args: gmap -n 0 -t 4 -d dmel-all-chrom-557 -D /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557/ /scratch/lfs/mcintyre/trago/dros_test_assembly/cap3/r324_dros_combined_trinity_and_cap3.fa --min-intronlength=4 -f 2
+Checking compiler assumptions for popcnt: 6B8B4567 __builtin_clz=1 __builtin_ctz=0 __builtin_popcount=17 
+Checking compiler assumptions for SSE2: 6B8B4567 327B23C6 xor=59F066A1
+Finished checking compiler assumptions
+Note: >1 sequence detected, so index files are being memory mapped.
+  GMAP can run slowly at first while the computer starts to accumulate
+  pages from the hard disk into its cache.  To copy index files into RAM
+  instead of memory mapping, use -B 3, -B 4, or -B 5, if you have enough RAM.
+  For more speed, also try multiple threads (-t <int>), if you have multiple processors or cores.
+Pre-loading compressed genome (oligos).....,...,...,...,...,...,...,...,..done (63,276,204 bytes, 15449 pages, 0.54 sec)
+Pre-loading compressed genome (bits).....,...,...,...,...,...,...,...,..done (63,276,240 bytes, 15449 pages, 0.18 sec)
+Looking for index files in directory /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557/
+  Pointers file is dmel-all-chrom-557.ref153offsets64meta
+  Offsets file is dmel-all-chrom-557.ref153offsets64strm
+  Positions file is dmel-all-chrom-557.ref153positions
+Offsets compression type: bitpack64
+Allocating memory for ref offset pointers, kmer 15, interval 3...done (134,217,744 bytes, 1.54 sec)
+Allocating memory for ref offsets, kmer 15, interval 3...done (226,957,888 bytes, 0.62 sec)
+Pre-loading ref positions, kmer 15, interval 3........................................................................................done (215,786,916 bytes, 52683 pages, 0.33 sec)
+No paths found for Contig434
+No paths found for Contig3265
+No paths found for Contig4137
+No paths found for Contig4571
+No paths found for Contig4740
+No paths found for Contig5328
+No paths found for Contig6364
+No paths found for Contig7821
+No paths found for Contig8328
+No paths found for Contig8510
+No paths found for Contig10361
+No paths found for Contig12439
+No paths found for Contig15815
+No paths found for Contig15818
+No paths found for Contig15819
+No paths found for Contig16591
+No paths found for Contig16660
+No paths found for Contig16785
+No paths found for Contig17207
+No paths found for Contig18913
+No paths found for Contig19058
+No paths found for Contig19062
+No paths found for Contig19432
+No paths found for Contig19679
+No paths found for Contig20181
+No paths found for c3692_g1_i1
+No paths found for c5681_g1_i1
+No paths found for c11152_g1_i1
+No paths found for c14061_g1_i1
+No paths found for c1197_g1_i1
+No paths found for c2491_g1_i1
+No paths found for c10429_g3_i1
+No paths found for c11117_g6_i4
+No paths found for c15319_g1_i1
+No paths found for c18248_g1_i1
+No paths found for c21983_g1_i1
+No paths found for c21921_g1_i1
+Processed 33767 queries in 9669.97 seconds (3.49 queries/sec)
+GMAP version 2014-12-22 called with args: gmap -n 0 -t 4 -d dmel-all-chrom-557 -D /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557/ /scratch/lfs/mcintyre/trago/dros_test_assembly/normalized_trinity/r324_dros_combined.Trinity.fasta --min-intronlength=4 -f 2
+Checking compiler assumptions for popcnt: 6B8B4567 __builtin_clz=1 __builtin_ctz=0 __builtin_popcount=17 
+Checking compiler assumptions for SSE2: 6B8B4567 327B23C6 xor=59F066A1
+Finished checking compiler assumptions
+Note: >1 sequence detected, so index files are being memory mapped.
+  GMAP can run slowly at first while the computer starts to accumulate
+  pages from the hard disk into its cache.  To copy index files into RAM
+  instead of memory mapping, use -B 3, -B 4, or -B 5, if you have enough RAM.
+  For more speed, also try multiple threads (-t <int>), if you have multiple processors or cores.
+Pre-loading compressed genome (oligos).....,...,...,...,...,...,...,...,..done (63,276,204 bytes, 15449 pages, 0.02 sec)
+Pre-loading compressed genome (bits).....,...,...,...,...,...,...,...,..done (63,276,240 bytes, 15449 pages, 0.11 sec)
+Looking for index files in directory /scratch/lfs/mcintyre/references/dmel_fb557/dmel-all-chrom-557/
+  Pointers file is dmel-all-chrom-557.ref153offsets64meta
+  Offsets file is dmel-all-chrom-557.ref153offsets64strm
+  Positions file is dmel-all-chrom-557.ref153positions
+Offsets compression type: bitpack64
+Allocating memory for ref offset pointers, kmer 15, interval 3...done (134,217,744 bytes, 0.21 sec)
+Allocating memory for ref offsets, kmer 15, interval 3...done (226,957,888 bytes, 0.25 sec)
+Pre-loading ref positions, kmer 15, interval 3........................................................................................done (215,786,916 bytes, 52683 pages, 0.08 sec)
+No paths found for c1951_g1_i1
+No paths found for c1977_g1_i1
+No paths found for c2708_g1_i1
+No paths found for c3692_g1_i1
+No paths found for c4627_g1_i1
+No paths found for c5490_g1_i1
+No paths found for c5681_g1_i1
+No paths found for c6482_g1_i1
+No paths found for c8257_g2_i1
+No paths found for c8257_g1_i1
+No paths found for c10920_g1_i3
+No paths found for c10920_g1_i2
+No paths found for c10920_g1_i6
+No paths found for c11152_g1_i1
+No paths found for c11846_g3_i1
+No paths found for c12074_g4_i1
+No paths found for c12527_g1_i1
+No paths found for c12899_g1_i1
+No paths found for c14061_g1_i1
+No paths found for c14665_g1_i1
+No paths found for c15665_g1_i1
+No paths found for c15733_g1_i1
+No paths found for c16492_g1_i1
+No paths found for c17868_g1_i1
+No paths found for c19461_g1_i1
+No paths found for c19759_g1_i1
+No paths found for c20751_g1_i1
+No paths found for c22206_g1_i1
+No paths found for c22437_g1_i1
+No paths found for c600_g1_i1
+No paths found for c1197_g1_i1
+No paths found for c1491_g1_i1
+No paths found for c1930_g1_i1
+No paths found for c2491_g1_i1
+No paths found for c2876_g1_i1
+No paths found for c3260_g1_i1
+No paths found for c4026_g1_i1
+No paths found for c5985_g1_i1
+No paths found for c6153_g1_i2
+No paths found for c8431_g1_i2
+No paths found for c8431_g1_i3
+No paths found for c8431_g1_i1
+No paths found for c10429_g2_i1
+No paths found for c10429_g3_i1
+No paths found for c10429_g3_i2
+No paths found for c11117_g6_i2
+No paths found for c11117_g6_i3
+No paths found for c11117_g6_i4
+No paths found for c11117_g6_i7
+No paths found for c11117_g6_i8
+No paths found for c11473_g6_i3
+No paths found for c11973_g1_i1
+No paths found for c15280_g1_i1
+No paths found for c15319_g1_i1
+No paths found for c15586_g1_i1
+No paths found for c15591_g1_i1
+No paths found for c16494_g1_i1
+No paths found for c16900_g1_i1
+No paths found for c17749_g1_i1
+No paths found for c18248_g1_i1
+No paths found for c19758_g1_i1
+No paths found for c20531_g1_i1
+No paths found for c21921_g1_i1
+No paths found for c21983_g1_i1
+Processed 65184 queries in 17866.00 seconds (3.65 queries/sec)
+/var/spool/torque/mom_priv/jobs/19084158.moab.ufhpc.SC: line 34: unexpected EOF while looking for matching `''
+/var/spool/torque/mom_priv/jobs/19084158.moab.ufhpc.SC: line 46: syntax error: unexpected end of file

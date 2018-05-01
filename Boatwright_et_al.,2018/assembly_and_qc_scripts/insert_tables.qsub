@@ -1,0 +1,31 @@
+#/bin/bash
+#PBS -M fnew@ufl.edu
+#PBS -m n
+#PBS -N riboinsert
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/scripts/PBS_LOGS/dup_flag
+#PBS -l walltime=12:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=10Gb
+#PBS -t 1-54
+
+module load python/2.7.3
+
+## Set Directories
+    PROJ=/scratch/lfs/mcintyre/trago
+    ORIG=$PROJ/original_data
+    OUT=$PROJ/qc/insert_counts/duplicates
+    PROG=$PROJ/scripts/dup_flag_v3.py
+
+    if [ ! -e $OUT ]; then mkdir -p $OUT; fi
+
+# Pull info from design file
+    DESIGN_FILE=$PROJ/design_files/list_fq_files_diploids.txt
+    DESIGN=$(sed -n "${PBS_ARRAYID}p" $DESIGN_FILE)
+
+
+    NAME=`basename "$DESIGN" .fastq`
+
+    python $PROG -i $ORIG/${NAME}.fastq -o $OUT/${NAME}_counts.csv

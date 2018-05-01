@@ -1,0 +1,46 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/outfiles/PBS_LOGS/
+#PBS -o Trimmomatic-paired-Read-Counts.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=05:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#######PBS -t 1-24%10
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/outfiles/trimmomatic
+OUTDIR=$WORK/$PROJ/outfiles/count
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+####start log
+LOGS=$OUTDIR/LOGS/ 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Trimmomatic-paired-Read-Counts.log
+OUT1=$OUTDIR/Tdu_R1_paired.txt
+OUT2=$OUTDIR/Tdu_R2_paired.txt
+OUT3=$OUTDIR/Tpr_R1_paired.txt
+OUT4=$OUTDIR/Tpr_R2_paired.txt
+OUT5=$OUTDIR/Tpo_R1_paired.txt
+OUT6=$OUTDIR/Tpo_R2_paired.txt
+
+wc -l $INDIR/Tdu*R1_001_trimmomatic_paired.fq > $OUT1
+wc -l $INDIR/Tdu*R2_001_trimmomatic_paired.fq > $OUT2 
+wc -l $INDIR/Tpr*R1_001_trimmomatic_paired.fq > $OUT3
+wc -l $INDIR/Tpr*R2_001_trimmomatic_paired.fq > $OUT4
+wc -l $INDIR/Tpo*R1_001_trimmomatic_paired.fq > $OUT5
+wc -l $INDIR/Tpo*R2_001_trimmomatic_paired.fq > $OUT6

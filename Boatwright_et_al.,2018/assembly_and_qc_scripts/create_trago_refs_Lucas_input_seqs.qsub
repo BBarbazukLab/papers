@@ -1,0 +1,59 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -q bio
+#PBS -l walltime=05:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=2gb
+
+module load bowtie
+module load samtools
+module load last/247
+
+## Set directories and variables
+PROJ=/scratch/lfs/mcintyre/trago
+REF=/scratch/lfs/mcintyre/trago/references
+
+
+#### (1) Build indexes from Lucas' TDU input sequences
+
+echo `date`": building bowtie index for TDU_consensed seqs"
+bowtie-build ${REF}/TDU_consensed_contigs_500-15k.fasta ${REF}/TDU_consensed_contigs_500-15k &>${REF}/TDU_consensed_contigs_500-15k_bt1
+
+echo `date`": building samtools index for TDU_consensed seqs"
+samtools faidx ${REF}/TDU_consensed_contigs_500-15k.fasta
+
+echo `date`": building LAST db for TDU_consensed"
+lastdb ${REF}/TDU_consensed_contigs_500-15k_last ${REF}/TDU_consensed_contigs_500-15k.fasta
+
+echo `date`": processing TDU_consensed seqs complete"
+
+
+#### (2) Build indexes from Lucas' TPO input sequences         
+
+echo `date`": building bowtie index for TPO_consensed seqs"
+bowtie-build ${REF}/TPO_consensed_contigs_500-15k.fasta ${REF}/TPO_consensed_contigs_500-15k &>${REF}/TPO_consensed_contigs_500-15k_bt1
+
+echo `date`": building samtools index for TPO_consensed seqs"
+samtools faidx ${REF}/TPO_consensed_contigs_500-15k.fasta
+
+echo `date`": building LAST db for TPO_consensed"
+lastdb ${REF}/TPO_consensed_contigs_500-15k_last ${REF}/TPO_consensed_contigs_500-15k.fasta
+
+echo `date`": processing TPO_consensed seqs complete"
+
+#### (3) Build indexes from Lucas' TPR input sequences
+
+echo `date`": building bowtie index for TPR_consensed seqs"
+bowtie-build ${REF}/TPR_consensed_contigs_500-15k.fasta ${REF}/TPR_consensed_contigs_500-15k &>${REF}/TPR_consensed_contigs_500-15k_bt1
+
+echo `date`": building samtools index for TPR_consensed seqs"
+samtools faidx ${REF}/TPR_consensed_contigs_500-15k.fasta
+
+echo `date`": building LAST db for TPR_consensed"
+lastdb ${REF}/TPR_consensed_contigs_500-15k_last ${REF}/TPR_consensed_contigs_500-15k.fasta
+
+echo `date`": processing TPR_consensed seqs complete"
+

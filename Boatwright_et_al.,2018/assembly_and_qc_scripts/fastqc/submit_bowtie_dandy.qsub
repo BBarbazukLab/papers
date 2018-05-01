@@ -1,0 +1,37 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -q bio
+#PBS -r n
+#PBS -j oe
+#PBS-o /project/mcintyre/dandelion_2012_HiSeq/dandy_alignments/dandy_aln_logs
+#PBS -l walltime=10:00:00
+#PBS -l nodes=1:ppn=4
+#PBS -l pmem=5gb
+#PBS -t 1-24
+
+module load bowtie/0.12.8
+
+#### Set Directories
+PROJ=/project/mcintyre/dandelion_2012_HiSeq
+DATAIN=$PROJ/original_data/catted_files
+REF=/project/mcintyre/references/dandelion
+WORK=$PROJ/dandy_alignments
+
+#### I am using an SGE Array (pulls out each name from the file and calls it 'design')
+DESIGN_FILE=$PROJ/list_fq_files.txt
+DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)  #steps through file_list.txt by row
+
+echo "$DESIGN, file I'm on"
+
+ID=$(basename "$DESIGN" .fq)
+
+echo "$ID, aligned against dandy"
+
+#note that bowtie sam file is piped to bit of perl script that removes unaligned reads from sam alignment
+
+## Start bowtie 
+bowtie --chunkmbs 1040 --sam -n 2 -e 70 -l 29 -m 1 --best --strata --tryhard --un $WORK/unaln_dandy_$ID.fq --max $WORK/ambig_dandy_$ID.fq $REF/taraxacum_officinale $PROJ/ercc_alignments/unaln_ERCC_$ID.fq | perl -ne 'if (/^@/) {next} @s = split; if ($s[1] != 4) {print}' >$WORK/aln_dandy_$ID.sam
+
+
+

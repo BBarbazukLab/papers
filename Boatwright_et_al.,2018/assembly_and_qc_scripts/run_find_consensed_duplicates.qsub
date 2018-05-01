@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/
+#PBS -l walltime=5:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=4gb
+
+module load python
+
+PROJ=/scratch/lfs/mcintyre/trago
+DATAIN=$PROJ/trago_output/trago_blast_dbs/consensus_compression/Trag_ortholog_files
+OUTDIR=$PROJ/trago_output/cnt_consensed_duplicates
+
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+cd $DATAIN
+
+for FA in $(ls *_consensed_contigs_500-15k.fasta)
+do
+
+    NAME=`basename $FA .fasta`
+
+    python /scratch/lfs/mcintyre/trago/scripts/identify_duplicates_fasta_files.py -i $FA -o $OUTDIR/$NAME.csv
+
+done
+

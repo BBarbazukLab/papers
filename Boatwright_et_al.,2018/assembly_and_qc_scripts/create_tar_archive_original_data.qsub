@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -m a
+#PBS -r n
+#PBS -N tar_orig
+#PBS -l walltime=48:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=80gb
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -j oe
+#PBS -q bio
+
+### tar original data together so can delete *.fastq files
+
+PROJ=/scratch/lfs/mcintyre/trago
+
+cd $PROJ/original_data
+
+tar -czf trago_original.tgz *.fastq trago-tetraploids/
+

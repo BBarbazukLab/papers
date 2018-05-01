@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -N Drosophila
+#PBS -M anazarian@ufl.edu
+#PBS -m n
+#PBS -r n
+#PBS -o /bio/mcintyre/trago/dros_outfiles/PBS_LOGS/blast
+#PBS -o Drosophila-trinity-zero-hit-and-filtered-out-150-blast-all-chromosomes.log
+#PBS -j oe
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=20:00:00
+#PBS -l pmem=5gb
+#PBS -q bio
+#####PBS -t 1
+
+#### This specifies to use the directory I submitted the script from
+cd $PBS_O_WORKDIR
+date
+module load ncbi_blast
+
+#### Set Directories
+WORK=/bio/mcintyre
+PROJ=trago
+INDIR=$WORK/$PROJ/dros_outfiles/blast
+OUTDIR=$WORK/$PROJ/dros_outfiles
+if [ ! -e $OUTDIR ]; then mkdir -p $OUTDIR; fi
+
+#####start log
+LOGS=$OUTDIR/LOGS/blast 		#script log information
+if [ ! -e $LOGS ]
+then
+    mkdir -p $LOGS
+fi
+
+MYLOG=$LOGS/Drosophila-trinity-zero-hit-and-filtered-out-150-blast-all-chromosomes.log
+printf "`date` \n\n" > $MYLOG
+
+######makeblastdb -in dmel-all-transcript-r5.30.fasta -dbtype 'nucl' -out dmel-all-transcript-r5.30_BLAST
+
+REF=$WORK/$PROJ/dros_outfiles/references/dmel-all-chromosome-r5.30_BLAST
+READS=$INDIR/trinity-blast-all-transcripts-zero-hits-and-filtered-out-150.fasta
+OUTFILE=$INDIR/trinity-zero-hit-and-filtered-out-150-blast-all-chromosomes-results.tsv
+
+blastn -db $REF -query $READS -outfmt 7 > $OUTFILE
+
+2>>$MYLOG

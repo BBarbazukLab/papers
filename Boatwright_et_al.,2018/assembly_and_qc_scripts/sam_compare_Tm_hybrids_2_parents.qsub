@@ -1,0 +1,56 @@
+#!/bin/bash
+#PBS -M ammorse@ufl.edu
+#PBS -N sam_Tm
+#PBS -m n
+#PBS -r n
+#PBS -j oe
+#PBS -o /scratch/lfs/mcintyre/trago/scripts/PBS_LOGS/
+#PBS -l walltime=15:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=160G
+#PBS -q bio
+#PBS -t 1-3
+
+## Tm hybrid (1-3) is cross of Tdu and Tpo
+## Tms hybrid (4-6) is cross of Tdu and Tpr
+
+module load python/2.7.3 
+
+#### Set Directories
+PROJ=/scratch/lfs/mcintyre/trago
+SCRIPTS=/scratch/lfs/mcintyre/python.git
+
+OUTPUT=$PROJ/trago_output/ase_counts 
+if [ ! -e $OUTPUT ]; then mkdir $OUTPUT; fi
+
+#### Create LOG directory
+LOGS=$OUTPUT/logs
+if [ ! -e $LOGS ]; then mkdir $LOGS; fi
+
+#### Using SGE Array to pull in species (all caps and not)  from external csv
+    DESIGN_FILE=$PROJ/design_files/trago_hybrids_with_reps.txt
+    DESIGN=$(cat $DESIGN_FILE | head -n $PBS_ARRAYID | tail -n 1)
+
+    IFS=',' read -ra ARRAY <<< "$DESIGN"
+
+    SP=${ARRAY[0]}
+    REP=${ARRAY[1]}
+
+### Concatenate reads for use in sam-compare
+cat ${PROJ}/original_data/trago-tetraploids/Sample_Tm${REP}/Tm${REP}_*.fastq | sed 's/ /_/g' > $TMPDIR/Tm_${REP}.fastq
+
+    ## Doing Tm so select TDU and TPO alignments for comparing
+    SAMA=$PROJ/trago_output/filtered_hybrid_sam_files/Tm_${REP}_uniq_2_TDU_filter_commomID.sam
+    SAMB=$PROJ/trago_output/filtered_hybrid_sam_files/Tm_${REP}_uniq_2_TPO_filter_commomID.sam 
+
+    # Run SAM Compare
+    python $SCRIPTS/sam_compare.py \
+	-d \
+        -l 100 \
+        -f $PROJ/references/TDU_tpo_bed_for_sam_compare.bed \
+        -q $TMPDIR/Tm_${REP}.fastq \
+        -A $SAMA \
+        -B $SAMB \
+        -c $OUTPUT/ase_counts_Tm_${REP}_2_Tdu_Tpo.csv \
+        -t $OUTPUT/ase_totals_Tm_${REP}_2_Tdu_Tpo.csv \
+        -g $LOGS/ase_counts_Tm_${REP}_2_Tdu_Tpo.log
