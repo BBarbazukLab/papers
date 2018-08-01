@@ -1,12 +1,10 @@
 # Brief description
 
 ## Documentation
----
 
-The primary part of the analysis (excluding read pre-processing and QC, which may be found in 'worksheet_trago_amm5.xls') may be viewed in the [New_World_PG_pipeline_documentation.html](https://htmlpreview.github.io/?https://github.com/BBarbazukLab/papers/blob/master/Boatwright_et_al.%2C2018/New_World_PG_pipeline_documentation.html).
+The primary part of the analysis (excluding read pre-processing and QC, which may be found in 'worksheet_trago_amm5.xls') may be viewed in the <a href="https://htmlpreview.github.io/?https://github.com/BBarbazukLab/papers/blob/master/Boatwright_et_al.%2C2018/New_World_PG_pipeline_documentation.html" target="_blank">New_World_PG_pipeline_documentation.html</a>.
 
 ## Python_CORE_scripts
----
 All python scripts contain usage information that may be accessed using:
 
 ```bash
