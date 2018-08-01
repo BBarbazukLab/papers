@@ -15,7 +15,7 @@ import seaborn as sns
 def parse_arguments():
     """Parse arguments passed to script"""
     parser = argparse.ArgumentParser(description=
-    "This script is designed to do X, Y, Z\n\n \
+    "This script is designed to take two bed files and generate a mean-difference plot of the CORE lengths\n\n \
     Example: python {0} -a A.bed -b B.bed -o BED_mean_difference.pdf".format(argv[0]),
     formatter_class = argparse.RawDescriptionHelpFormatter)
     
