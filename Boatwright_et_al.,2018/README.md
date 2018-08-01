@@ -1,12 +1,10 @@
-# Brief description
-
-## Documentation
+# Documentation
 
 Read pre-processing/QC/assembly construction are described in worksheet_trago_amm5.xls
 
 Read alignment/Poisson-Gamma/final result processing may be viewed in <a href="https://htmlpreview.github.io/?https://github.com/BBarbazukLab/papers/blob/master/Boatwright_et_al.%2C2018/New_World_PG_pipeline_documentation.html" target="_blank">New_World_PG_pipeline_documentation.html</a>.
 
-## Python_CORE_scripts
+# Python_CORE_scripts
 All python scripts contain usage information that may be accessed using:
 
 ```bash
