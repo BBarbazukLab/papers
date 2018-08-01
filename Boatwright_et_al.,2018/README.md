@@ -2,7 +2,9 @@
 
 ## Documentation
 
-The primary part of the analysis (excluding read pre-processing and QC, which may be found in 'worksheet_trago_amm5.xls') may be viewed in the <a href="https://htmlpreview.github.io/?https://github.com/BBarbazukLab/papers/blob/master/Boatwright_et_al.%2C2018/New_World_PG_pipeline_documentation.html" target="_blank">New_World_PG_pipeline_documentation.html</a>.
+Read pre-processing/QC/assembly construction are described in worksheet_trago_amm5.xls
+
+Read alignment/Poisson-Gamma/final result processing may be viewed in <a href="https://htmlpreview.github.io/?https://github.com/BBarbazukLab/papers/blob/master/Boatwright_et_al.%2C2018/New_World_PG_pipeline_documentation.html" target="_blank">New_World_PG_pipeline_documentation.html</a>.
 
 ## Python_CORE_scripts
 All python scripts contain usage information that may be accessed using:
@@ -12,6 +14,24 @@ python <script_name> -h
 ```
 
 The help usage is as follows:
+
+```bash
+python group_self_BLAST.py -h
+
+usage: group_self_BLAST.py [-h] -b BLAST
+
+This script is designed to take a parsed BLAST file and generate a     
+table of groups. The grouping method is greedy.
+
+     Example: python group_self_BLAST.py -b parsed_BLAST
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -b BLAST, --BLAST BLAST
+                        Parsed BLAST file used for grouping transcripts.
+```
 
 ```bash
 python contig_compression.py -h
@@ -57,21 +77,28 @@ required arguments:
 ```
 
 ```bash
-python group_self_BLAST.py -h
+python BLAST_COREs.py -h
 
-usage: group_self_BLAST.py [-h] -b BLAST
+usage: BLAST_COREs.py [-h] -a BLAST_A -b BLAST_B -p PROGRAM
 
-This script is designed to take a parsed BLAST file and generate a     
-table of groups. The grouping method is greedy.
-
-     Example: python group_self_BLAST.py -b parsed_BLAST
+This script is designed to identify reciprocal best-hits given two     
+parsed BLAST files. Output includes reciprocated_blast_hits.txt and     
+two BED files representing HSP coordinates from BLAST_A for query     
+and subject.
+    
+    Usage: python BLAST_COREs.py -a A_to_B_BLAST -b B_to_A_BLAST    
 
 optional arguments:
   -h, --help            show this help message and exit
-
-required arguments:
-  -b BLAST, --BLAST BLAST
-                        Parsed BLAST file used for grouping transcripts.
+  -a BLAST_A, --BLAST_A BLAST_A
+                        Parsed BLAST file from species A in tab-separated
+                        format.
+  -b BLAST_B, --BLAST_B BLAST_B
+                        Parsed BLAST file from species B in tab-separated
+                        format.
+  -p PROGRAM, --PROGRAM PROGRAM
+                        Program used to generate tabular blast -- NCBI or WU
+                        parsed.
 ```
 
 ```bash
@@ -105,31 +132,6 @@ positional arguments:
 
 optional arguments:
   -h, --help   show this help message and exit
-```
-
-```bash
-python BLAST_COREs.py -h
-
-usage: BLAST_COREs.py [-h] -a BLAST_A -b BLAST_B -p PROGRAM
-
-This script is designed to identify reciprocal best-hits given two     
-parsed BLAST files. Output includes reciprocated_blast_hits.txt and     
-two BED files representing HSP coordinates from BLAST_A for query     
-and subject.
-    
-    Usage: python BLAST_COREs.py -a A_to_B_BLAST -b B_to_A_BLAST    
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -a BLAST_A, --BLAST_A BLAST_A
-                        Parsed BLAST file from species A in tab-separated
-                        format.
-  -b BLAST_B, --BLAST_B BLAST_B
-                        Parsed BLAST file from species B in tab-separated
-                        format.
-  -p PROGRAM, --PROGRAM PROGRAM
-                        Program used to generate tabular blast -- NCBI or WU
-                        parsed.
 ```
 
 ```bash
