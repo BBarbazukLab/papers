@@ -1,0 +1,48 @@
+Assembly Compression (custom scripts portion):
+==============================================
+# Performed self-WU_BLAST for datasets. 
+
+#Blast output was parsed with XY_WU_BP.pl which depends upon X_Y.pm and BPlitenew.pm (*make sure the path information in XY_WU_BP.pl is correct along with the appropriate parameters)
+perl ../XY_WU_BP.pl Blast_report >> parsed_complete.txt
+
+# Used group_self_BLAST.py to generate groupings. 
+# This program takes XY_WU_BP-parsed output and generates groupings for compression
+python group_self_BLAST.py -b parsed_BLAST
+
+# grouped_hits was then sent through contig_compression.py, which results in the typical CAP3 output as both singlets and contigs.
+
+        OUTPUT files:   contigs_in_out.txt
+                        compressed_cap3_log
+                        cap3_output
+                        cap3_log
+                        alleles_collapsed.fasta
+                        allele_compression_data.txt
+                        ace_files.ace
+                        compressed_cap3_output
+
+                        *some of these are temporary files, some are tracking files, while contigs_collapsed.fasta is the desired output (contains singlets and contigs)
+
+unique_contigs.pl uses "grouped_hits" to determine which contigs were not grouped and add those (essentially singlets) to the new assembly
+        unique_contigs.pl > unique_contigs | xdget -n -f /path/to/previousAssembly unique_contigs > Uniq_{SPECIES}_seqs.fa
+Unique and contigs_collapsed were concatenated to produce {Species}_CAP3-2_output 
+
+# Consensus grouping also underwent a self-BLAST but after parsing isolate_consensus.py was used on the grouped_hits instead of CAP3.
+python isolate_consensus.py -g grouped_hits.txt -f sequences.fasta
+
+Ortholog calling:
+=================
+# After assemblies are compressed, orthologs are identified using reciprocal BLAST hits between the two assemblies.
+Run BLASTs, filter (perl scripts), then run:
+python BLAST_COREs.py -a A_to_B_BLAST -b B_to_A_BLAST
+
+# A modified script is also available which uses global instead of local alignments. It also offers CORE identification in the instance that pre-determined orthologs are available. This is best used for closely related species.
+python determine_COREs.py -o orthologs.csv -f A.fasta -g B.fasta
+
+Plotting scripts:
+=================
+# Plotting scripts are also provided to visualize the degree of similarity between COREs
+python BED_mean_difference.py -a A.bed -b B.bed -o BED_mean_difference.pdf
+
+# A preliminary step is required for the GC MD script: EDIT getGC.bash ACCORDINGLY
+bash getGC.bash
+python BED_GC_MD.py -a A.bed.stats.csv -b B.bed.stats.csv -o orthlogs.txt
