@@ -2,7 +2,7 @@
 Repository containing all scripts and documentation for published papers.
 
 ## 2018
-*
+* [Boatwright et al. 2018](http://www.genetics.org/content/early/2018/09/13/genetics.118.301564): Boatwright JL, McIntyre LM, Morse AM, Chen S, Yoo MJ, Koh J, Soltis PS, Soltis DE, Barbazuk WB. A Robust Methodology for Assessing Differential Homeolog Contributions to the Transcriptomes of Allopolyploids. GENETICS. 2018 Sept 13. 
 
 ## 2017
 * [Mei et al. 2017](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5423905/): Mei W, Liu S, Schnable JC, Yeh CT, Springer NM, Schnable PS, Barbazuk WB. A Comprehensive Analysis of Alternative Splicing in Paleopolyploid Maize. Frontiers in plant science. 2017;8.
