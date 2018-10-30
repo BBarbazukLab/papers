@@ -1,0 +1,128 @@
+---
+title: "Voom Time Course"
+author: "Jason Orr Brant"
+date: "August 12, 2016"
+output: html_document
+---
+
+#### Set working directory and load required package
+
+```{r echo=TRUE, results='hide', message=FALSE}
+setwd("~/Desktop/Dropbox (UFL)/RSEM_DATA/JULY_2016/TIME_COURSE/")
+x <- c("limma", "edgeR", "org.Mm.eg.db", "AnnotationDbi", "tidyr")
+lapply(x, require, character.only = T)
+```
+
+#### Load count data and filter based on counts per million
+Provide as input files containing raw counts; these were created using the Trinity/RSEM pipeline.
+Change sample size and cpm based on each experiment.
+
+```{r results='hold'}
+rnaseqMatrix <- read.table("~/Desktop/Dropbox (UFL)/RSEM_DATA/JULY_2016/TIME_COURSE/aco_and_mus_MR_gene_counts_matrix.txt", header=T, row.names=1, com='')
+rnaseqMatrix <- round(rnaseqMatrix)
+dge <- DGEList(counts=rnaseqMatrix)
+dim(dge)
+keep <- rowSums(cpm(dge) > cpm(20,mean(dge$samples$lib.size))[1]) >= 3
+dge <- dge[keep,]
+dim(dge)
+dge
+dge <- calcNormFactors(dge, method='TMM')
+```
+
+#### Create treatment factor variable and set design 
+
+```{r}
+trt <- factor(c(1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,5,6,6,6,6), labels = c("AcomysDay0", "AcomysDay7", "AcomysDay14", "MusDay0", "MusDay7", "MusDay14"))
+design <- model.matrix(~0 + trt)
+```
+
+#### Build overall model. 
+Plot mean variance trend and MDS plots
+```{r echo = TRUE, fig.show='hold'}
+#png(filename = "./Acomys_vs_Mus_mean_variance.png")
+voom <- voom(dge, design, plot = T) # normalize.method = "scale"
+#dev.off()
+#png(filename='./Acomys_vs_Mus_MDS_plot.png')
+plotMDS(voom, main="MDS plot")
+#dev.off()
+fit = eBayes(lmFit(voom,design))
+top = topTable(fit,coef=ncol(design),number=Inf)
+write.table(top, "./Acomys_vs_Mus_DE_overall_model.txt", sep = '\t', quote = F, row.names = T)
+```
+
+# Determine which genes respond differently over time in Acomys relative to Mus (Days 0, 7 and 14)
+
+```{r}
+cont.dif <- makeContrasts(Dif_7day = (trtAcomysDay7-trtAcomysDay0)-(trtMusDay7-trtMusDay0),
+    Dif14day=(trtAcomysDay14-trtAcomysDay7)-(trtMusDay14-trtMusDay7),levels=design)
+fit2 <- contrasts.fit(fit, cont.dif)
+fit2 <- eBayes(fit2)
+#topTableF(fit2, adjust="BH")
+top = topTableF(fit2, number=Inf)
+top2 <- top
+top2$names <- rownames(top)
+keys <- as.character(top2$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top2, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+
+write.table(resultsTable, file = "./time_course_Mus_Aco_days0-7-14.txt", sep = '\t', quote = F, row.names = F)
+```
+
+# Determine which genes respond differently over time in Acomys relative to Mus (Days 0 and 7)
+
+```{r}
+cont.dif <- makeContrasts(Dif_7day = (trtAcomysDay7-trtAcomysDay0)-(trtMusDay7-trtMusDay0), levels=design)
+fit2 <- contrasts.fit(fit, cont.dif)
+fit2 <- eBayes(fit2)
+#topTableF(fit2, adjust="BH")
+top = topTableF(fit2, number=Inf)
+top2 <- top
+top2$names <- rownames(top)
+keys <- as.character(top2$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top2, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+
+write.table(resultsTable, file = "./time_course_Mus_Aco_days0-7.txt", sep = '\t', quote = F, row.names = F)
+```
+
+# Determine which genes respond differently over time in Acomys relative to Mus (Days 0 and 14)
+
+```{r}
+cont.dif <- makeContrasts(Dif_14day = (trtAcomysDay14-trtAcomysDay0)-(trtMusDay14-trtMusDay0), levels=design)
+fit2 <- contrasts.fit(fit, cont.dif)
+fit2 <- eBayes(fit2)
+#topTableF(fit2, adjust="BH")
+top = topTableF(fit2, number=Inf)
+top2 <- top
+top2$names <- rownames(top)
+keys <- as.character(top2$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top2, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+
+write.table(resultsTable, file = "./time_course_Mus_Aco_days0-14.txt", sep = '\t', quote = F, row.names = F)
+```
+
+# Determine which genes respond differently over time in Acomys relative to Mus (Days 7 and 14)
+
+```{r}
+cont.dif <- makeContrasts(Dif14day = (trtAcomysDay14-trtAcomysDay7)-(trtMusDay14-trtMusDay7), levels=design)
+fit2 <- contrasts.fit(fit, cont.dif)
+fit2 <- eBayes(fit2)
+#topTableF(fit2, adjust="BH")
+top = topTableF(fit2, number=Inf)
+top2 <- top
+top2$names <- rownames(top)
+keys <- as.character(top2$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top2, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+
+write.table(resultsTable, file = "./time_course_Mus_Aco_days7-14.txt", sep = '\t', quote = F, row.names = F)
+```
+
+#### Session Information
+
+```{r}
+Sys.time()
+sessionInfo()
+```
+

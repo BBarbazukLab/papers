@@ -1,0 +1,153 @@
+---
+title: "Acomys Differential Expression Analysis Using VOOM (Merged & Unmerged)"
+author: "Jason Orr Brant"
+date: "`r Sys.time()`"
+output: html_document
+---
+
+#### Set working directory and load required package
+
+```{r echo=TRUE, results='hide', message=FALSE}
+setwd("/Users/jasonbrant/Desktop/Dropbox (UFL)/RSEM_DATA/JULY_2016/ACO_PER_SE/")
+x <- c("limma", "edgeR", "org.Mm.eg.db", "AnnotationDbi", "tidyr")
+lapply(x, require, character.only = T)
+```
+
+#### Load count data and filter based on counts per million
+Provide as input files containing raw counts; these were created using the Trinity/RSEM pipeline.
+Change sample size and cpm based on each experiment.
+
+```{r results='hold'}
+rnaseqMatrix <- read.table("/Users/jasonbrant/Desktop/Dropbox (UFL)/RSEM_DATA/JULY_2016/ACO_PER_SE/aco_per_se_genes_counts_matrix.txt", header=T, row.names=1, com='')
+rnaseqMatrix <- round(rnaseqMatrix)
+dge <- DGEList(counts=rnaseqMatrix)
+dim(dge)
+keep <- rowSums(cpm(dge) > cpm(20,mean(dge$samples$lib.size))[1]) >= 4
+dge <- dge[keep,]
+dim(dge)
+dge
+```
+
+#### Create treatment factor variable and set design 
+
+```{r}
+trt <- factor(c(1,1,1,1,2,2,2,2,3,3,3,3), labels = c("AcomysDay0", "AcomysDay7", "AcomysDay14"))
+design <- model.matrix(~0 + trt)
+```
+
+#### Build overall model. 
+Plot mean variance trend and MDS plots
+```{r echo = TRUE, fig.show='hold'}
+#png(filename = "./Acomys_mean_variance.png")
+voom <- voom(dge, design, plot = T)
+#dev.off()
+#png(filename='./Acomys_MDS_plot.png')
+plotMDS(voom, main="MDS plot")
+#dev.off()
+fit = eBayes(lmFit(voom,design))
+top = topTable(fit,coef=ncol(design),number=Inf)
+write.table(top, "./Acomys_DE_overall_model.txt", sep = '\t', quote = F, row.names = T)
+```
+
+#### AcomysDay7 vs AcomysDay0 pairwise contrasts
+
+```{r fig.show='hold'}
+contrast.matrix <- makeContrasts(contrasts = c("trtAcomysDay7-trtAcomysDay0"), levels = design)
+fit2 <- contrasts.fit(fit, contrast.matrix)
+fit2 <- eBayes(fit2)
+#png(filename = "./AcomysDay7_vs_AcomysDay0_Q-Q_plot.png")
+qqt(fit2$t, df=fit2$df.prior+fit2$df.residual,pch=16,cex=0.2,main="AcomysDay7 vs AcomysDay0 Q-Q plot")
+abline(0,1)
+#dev.off()
+top=topTable(fit2, sort="none", n=Inf, coef=ncol(contrast.matrix))
+source("/Users/jasonbrant/Desktop/Dropbox (UFL)/Regeneration_Project/RNA_Seq/ACOMYS/AGGREGATE/rnaseq_plot_funcs.R")
+c = cpm(dge)
+m = apply(c, 1, mean)
+top2 = cbind(top, logCPM=log2(m[rownames(top)]))
+#png("Acomys_genes_counts.counts.matrix.Day_7_vs_Day_0.voom.DE_results.MA_Plot.png")
+plot_MA(top2$logCPM, top2$logFC, top2$'adj.P.Val')
+#dev.off()
+#png("Acomys_genes_counts.counts.matrix.Day_7_vs_Day_0.voom.DE_results.Volcano_Plot.png")
+plot_Volcano(top2$logFC, top2$'adj.P.Val')
+#dev.off()
+top3 <- top2
+top3$names <- rownames(top2)
+rownames(top3) <- NULL
+top3 <- top3[,c("names", "logFC", "AveExpr", "t", "P.Value", "adj.P.Val", "B", "logCPM")]
+keys <- as.character(top3$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top3, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+write.table(resultsTable, "AcomysDay7_vs_AcomysDay0_MR_UN_RSEM_Voom_DE_ResultsTable.txt", row.names = F, quote = F, sep = '\t')
+head(resultsTable)
+```
+
+#### AcomysDay14 vs AcomysDay0 pairwise contrasts
+
+```{r fig.show='hold'}
+contrast.matrix=makeContrasts(contrasts=c("trtAcomysDay14-trtAcomysDay0"), levels=design)
+fit2=contrasts.fit(fit, contrast.matrix)
+fit2 <- eBayes(fit2)
+#png(filename='./AcomysDay14_vs_AcomysDay0_Q-Q_plot.png')
+qqt(fit2$t , df=fit2$df.prior+fit2$df.residual,pch=16,cex=0.2,main="AcomysDay14 vs AcomysDay0 Q-Q plot")
+abline(0,1)
+#dev.off()
+top=topTable(fit2, sort="none", n=Inf, coef=ncol(contrast.matrix))
+source("/Users/jasonbrant/Desktop/Dropbox (UFL)/Regeneration_Project/RNA_Seq/ACOMYS/AGGREGATE/rnaseq_plot_funcs.R")
+c = cpm(dge)
+m = apply(c, 1, mean)
+top2 = cbind(top, logCPM=log2(m[rownames(top)]))
+#png("Acomys_genes_counts.counts.matrix.Day_14_vs_Day_0.voom.DE_results.MA_Plot.png")
+plot_MA(top2$logCPM, top$logFC, top$'adj.P.Val')
+#dev.off()
+#png("Acomys_genes_counts.counts.matrix.Day_14_vs_Day_0.voom.DE_results.Volcano_Plot.png")
+plot_Volcano(top$logFC, top$'adj.P.Val')
+#dev.off()
+top3 <- top2
+top3$names <- rownames(top2)
+rownames(top3) <- NULL
+top3 <- top3[,c("names", "logFC", "AveExpr", "t", "P.Value", "adj.P.Val", "B", "logCPM")]
+keys <- as.character(top3$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top3, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+write.table(resultsTable, "AcomysDay14_vs_AcomysDay0_MR_UN_RSEM_Voom_DE_ResultsTable.txt", row.names = F, quote = F, sep = '\t')
+head(resultsTable)
+```
+
+#### AcomysDay14 vs AcomysDay7 pairwise contrasts
+
+```{r fig.show='hold'}
+contrast.matrix=makeContrasts(contrasts=c("trtAcomysDay14-trtAcomysDay7"), levels=design)
+fit2=contrasts.fit(fit, contrast.matrix)
+fit2 <- eBayes(fit2)
+#png(filename='./AcomysDay14_vs_AcomysDay7_Q-Q_plot.png')
+qqt(fit2$t , df=fit2$df.prior+fit2$df.residual,pch=16,cex=0.2,main="AcomysDay14 vs AcomysDay7 Q-Q plot")
+abline(0,1)
+#dev.off()
+top=topTable(fit2, sort="none", n=Inf, coef=ncol(contrast.matrix))
+source("/Users/jasonbrant/Desktop/Dropbox (UFL)/Regeneration_Project/RNA_Seq/ACOMYS/AGGREGATE/rnaseq_plot_funcs.R")
+c = cpm(dge)
+m = apply(c, 1, mean)
+top2 = cbind(top, logCPM=log2(m[rownames(top)]))
+#png("Acomys_genes_counts.counts.matrix.Day_14_vs_Day_7.voom.DE_results.MA_Plot.png")
+plot_MA(top2$logCPM, top$logFC, top$'adj.P.Val')
+#dev.off()
+#png("Acomys_genes_counts.counts.matrix.Day_14_vs_Day_7.voom.DE_results.Volcano_Plot.png")
+plot_Volcano(top$logFC, top$'adj.P.Val')
+#dev.off()
+top3 <- top2
+top3$names <- rownames(top2)
+rownames(top3) <- NULL
+top3 <- top3[,c("names", "logFC", "AveExpr", "t", "P.Value", "adj.P.Val", "B", "logCPM")]
+keys <- as.character(top3$names)
+top4 <- select(org.Mm.eg.db, keys = keys, columns = "GENENAME", keytype = "SYMBOL")
+resultsTable <- merge(top3, top4, by.x = "names", by.y = "SYMBOL", all.x = T)
+write.table(resultsTable, "AcomysDay14_vs_AcomysDay7_MR_UN_RSEM_Voom_DE_ResultsTable.txt", row.names = F, quote = F, sep = '\t')
+head(resultsTable)
+```
+
+#### Session Information
+
+```{r}
+Sys.time()
+sessionInfo()
+```
